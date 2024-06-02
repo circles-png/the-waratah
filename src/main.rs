@@ -84,7 +84,11 @@ mod components {
 
     #[component]
     pub fn PageContainer(children: Children) -> impl IntoView {
-        view! { <main class="flex justify-center max-w-3xl p-4 grow">{children()}</main> }
+        view! {
+            <main class="flex justify-center p-4 grow">
+                <div class="max-w-3xl">{children()}</div>
+            </main>
+        }
     }
 
     #[component]
@@ -125,13 +129,12 @@ mod components {
         struct ArticleParams {
             id: String,
         }
-        let article =
-            use_params::<ArticleParams>().with_untracked(|params| {
-                ARTICLES
-                    .iter()
-                    .find(|article| article.id == params.as_ref().unwrap().id.clone())
-                    .unwrap()
-            });
+        let article = use_params::<ArticleParams>().with_untracked(|params| {
+            ARTICLES
+                .iter()
+                .find(|article| article.id == params.as_ref().unwrap().id.clone())
+                .unwrap()
+        });
         view! {
             <div class="flex flex-col gap-4">
                 <div>
