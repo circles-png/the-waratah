@@ -24,8 +24,7 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    env:
-      TRUNK_BUILD_PUBLIC_URL: '/the-yesterday'
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -49,7 +48,7 @@ jobs:
       - name: Install Trunk
         uses: jetli/trunk-action@v0.5.0
       - name: Build
-        run: trunk build
+        run: trunk build --release --public-url "${GITHUB_REPOSITORY#*/}"
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
