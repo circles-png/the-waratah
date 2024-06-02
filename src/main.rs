@@ -50,13 +50,6 @@ mod components {
 
     #[component]
     pub fn App() -> impl IntoView {
-        fn path(path: &'static str) -> String {
-            if is_dev() {
-                path.to_string()
-            } else {
-                format!("/the-yesterday{path}")
-            }
-        }
         view! {
             <Router>
                 <div class="flex flex-col h-full">
@@ -64,14 +57,13 @@ mod components {
                     <PageContainer>
                         <Routes>
                             <Route
-                                path=path("/")
+                                path="/"
                                 view=|| {
                                     view! { <ArticlePreviews/> }
                                 }
                             />
-
-                            <Route path=path("/articles/:id") view=Article/>
-                            <Route path=path("/*") view=|| "404"/>
+                            <Route path="/articles/:id" view=Article/>
+                            <Route path="/*" view=|| "404"/>
                         </Routes>
                     </PageContainer>
                     <Footer/>
@@ -195,7 +187,12 @@ mod components {
 
     #[component]
     pub fn Divider(#[prop(optional)] light: bool) -> impl IntoView {
-        view! { <div class="w-full h-px bg-gray-800" class:bg-gray-200=light ></div> }
+        view! {
+            <div class=format!(
+                "w-full h-px {}",
+                if light { "bg-gray-200" } else { "bg-gray-800" },
+            )></div>
+        }
     }
 
     #[component]
