@@ -49,8 +49,7 @@ jobs:
       - name: Install Trunk
         uses: jetli/trunk-action@v0.5.0
       - name: Build
-        run: |
-          trunk build
+        run: trunk build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
