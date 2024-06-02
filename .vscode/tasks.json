@@ -8,13 +8,8 @@
             "command": "trunk serve --open"
         },
         {
-            "label": "tailwind dev",
-            "type": "shell",
-            "command": "npx tailwindcss -i ./src/styles/input.css -o ./src/styles/output.css -wm"
-        },
-        {
             "label": "dev",
-            "dependsOn": ["trunk dev", "tailwind dev"],
+            "dependsOn": ["trunk dev"],
             "group": {
                 "kind": "build",
                 "isDefault": true
