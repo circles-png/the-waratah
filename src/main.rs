@@ -51,7 +51,7 @@ mod components {
     #[component]
     pub fn App() -> impl IntoView {
         view! {
-            <Router>
+            <Router base="/the-yesterday">
                 <div class="flex flex-col h-full">
                     <Header/>
                     <PageContainer>
