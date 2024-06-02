@@ -40,13 +40,23 @@ mod components {
     use crate::article::Fragment;
     use crate::{article::Article, ARTICLES};
     use chrono::Local;
-    use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWithUntracked};
+    use leptos::{
+        component, leptos_dom::is_dev, view, Children, CollectView, IntoView, Params,
+        SignalWithUntracked,
+    };
     use leptos_router::Params;
     use leptos_router::A;
     use leptos_router::{use_params, Route, Router, Routes};
 
     #[component]
     pub fn App() -> impl IntoView {
+        fn path(path: &'static str) -> String {
+            if is_dev() {
+                path.to_string()
+            } else {
+                format!("/the-yesterday{path}")
+            }
+        }
         view! {
             <Router>
                 <div class="flex flex-col h-full">
@@ -54,14 +64,14 @@ mod components {
                     <PageContainer>
                         <Routes>
                             <Route
-                                path="/"
+                                path=path("/")
                                 view=|| {
                                     view! { <ArticlePreviews/> }
                                 }
                             />
 
-                            <Route path="/articles/:id" view=Article/>
-                            <Route path="*" view=|| "404"/>
+                            <Route path=path("/articles/:id") view=Article/>
+                            <Route path=path("/*") view=|| "404"/>
                         </Routes>
                     </PageContainer>
                     <Footer/>
