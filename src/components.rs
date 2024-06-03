@@ -12,18 +12,12 @@ use rand::thread_rng;
 #[component]
 pub fn App() -> impl IntoView {
     view! {
-        <Router base="the-yesterday">
+        <Router>
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
-                    <Routes base="the-yesterday".to_string()>
-                        <Route
-                            path="/"
-                            view=|| {
-                                view! { <ArticlePreviews/> }
-                            }
-                        />
-
+                    <Routes>
+                        <Route path="/" view=ArticlePreviews/>
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/*" view=|| "404"/>
                     </Routes>
