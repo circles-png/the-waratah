@@ -186,7 +186,7 @@ pub fn ReadMore(this_article: &'static Article) -> impl IntoView {
 
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
-    view! { <h1 class="font-serif text-3xl font-medium uppercase">{children()}</h1> }
+    view! { <h1 class="font-serif text-4xl font-medium uppercase">{children()}</h1> }
 }
 
 #[component]
@@ -196,7 +196,6 @@ pub fn Footer() -> impl IntoView {
             <Heading>
                 <div class="capitalize font-blackletter">"The Yesterday"</div>
             </Heading>
-            <Divider light=true/>
             "Copyright \u{a9} 2024"
         </footer>
     }
