@@ -206,7 +206,6 @@ pub fn Footer() -> impl IntoView {
                     <div class="capitalize font-blackletter">"The Yesterday"</div>
                 </Heading>
             </A>
-            <Divider light=true/>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
                 <div>"Brought to you by incredible reporters (and some credible ones)."</div>
