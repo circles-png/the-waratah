@@ -118,7 +118,7 @@ pub fn Article() -> impl IntoView {
                 <Caption>{article.image.caption}</Caption>
             </div>
             <Divider/>
-            <div class="flex flex-col gap-4
+            <div class="flex flex-col gap-4 text-lg
             [&>div:first-child>p]:first-letter:text-5xl
             [&>div:first-child>p]:first-letter:leading-none
             [&>div:first-child>p]:first-letter:font-bold
