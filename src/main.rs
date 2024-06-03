@@ -185,7 +185,7 @@ mod components {
                         })
                         .collect_view()}
                 </div>
-                <Divider/>
+                // <Divider/>
                 <ReadMore this_article=article/>
             </div>
         }
@@ -236,7 +236,7 @@ mod components {
         view! {
             <footer class="flex flex-col p-4 text-white bg-black">
                 <Heading>"The Yesterday"</Heading>
-                <Divider light=true/>
+                // <Divider light=true/>
                 "Copyright \u{a9} 2024"
             </footer>
         }
