@@ -6,3 +6,8 @@
     font-family: "Unifraktur Maguntia";
     src: url("fonts/UnifrakturMaguntia.ttf") format("truetype");
 }
+
+@font-face {
+    font-family: "PT Sans";
+    src: url("fonts/PTSans.ttf") format("truetype");
+}
