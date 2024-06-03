@@ -185,7 +185,7 @@ mod components {
                         })
                         .collect_view()}
                 </div>
-                // <Divider/>
+                <Divider/>
                 <ReadMore this_article=article/>
             </div>
         }
