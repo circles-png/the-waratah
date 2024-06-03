@@ -41,7 +41,7 @@ pub fn Header() -> impl IntoView {
             <div class="md:absolute">{Local::now().format("%B %-d, %Y").to_string()}</div>
             <A class="w-full text-center" href="/">
                 <Heading>
-                    <div class="capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="capitalize text-5xl font-blackletter">"The Yesterday"</div>
                 </Heading>
             </A>
         </header>
