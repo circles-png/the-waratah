@@ -83,7 +83,8 @@ impl Article {
     }
 
     pub fn reading_time(&self) -> usize {
-        self.text_len().div_ceil(200)
+        const AVERAGE_ADULT_READING_SPEED: usize = 238;
+        self.text_len().div_ceil(AVERAGE_ADULT_READING_SPEED)
     }
 }
 
