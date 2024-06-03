@@ -2,7 +2,7 @@ use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
 
-use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWithUntracked};
+use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWith};
 use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
@@ -32,7 +32,10 @@ pub fn App() -> impl IntoView {
 pub fn Header() -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
-            <div class="md:absolute">{Local::now().format("%B %-d, %Y").to_string()}</div>
+            <div class="inset-0 flex items-center justify-between md:p-4 md:absolute">
+                <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
+                <div>"Tagline"</div>
+            </div>
             <A class="w-full text-center" href="/">
                 <Heading>
                     <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
@@ -80,7 +83,9 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
                 <Heading>
                     <div class="text-xl">{article.title}</div>
                 </Heading>
-                <Caption><div class="text-left text-sm">{article.blurb}</div></Caption>
+                <Caption>
+                    <div class="text-sm text-left">{article.blurb}</div>
+                </Caption>
             </div>
         </A>
     }
@@ -92,26 +97,28 @@ pub fn Article() -> impl IntoView {
     struct ArticleParams {
         id: String,
     }
-    let article = use_params::<ArticleParams>().with_untracked(|params| {
-        ARTICLES
-            .iter()
-            .find(|article| article.id == params.as_ref().unwrap().id.clone())
-            .unwrap()
-    });
+    let article = || {
+        use_params::<ArticleParams>().with(|params| {
+            ARTICLES
+                .iter()
+                .find(|article| article.id == params.as_ref().unwrap().id.clone())
+                .unwrap()
+        })
+    };
     view! {
         <div class="flex flex-col gap-4">
             <div>
-                <Heading>{article.title.to_uppercase()}</Heading>
+                <Heading>{article().title.to_uppercase()}</Heading>
                 <div class="flex gap-1 text-sm font-light">
                     <div class="text-blue-800">"ARTICLE"</div>
                     "\u{b7} "
-                    {article.reading_time()}
+                    {article().reading_time()}
                     " min read"
                 </div>
             </div>
             <div class="px-16">
-                <img src=article.image.url alt=article.title class="object-cover w-full"/>
-                <Caption>{article.image.caption}</Caption>
+                <img src=article().image.url alt=article().title class="object-cover w-full"/>
+                <Caption>{article().image.caption}</Caption>
             </div>
             <Divider/>
             <div class="flex flex-col gap-5 text-lg
@@ -120,7 +127,7 @@ pub fn Article() -> impl IntoView {
             [&>div:first-child>p]:first-letter:font-bold
             [&>div:first-child>p]:first-letter:float-left
             [&>div:first-child>p]:first-letter:pr-2">
-                {article
+                {article()
                     .fragments
                     .iter()
                     .map(|fragment| {
@@ -145,7 +152,7 @@ pub fn Article() -> impl IntoView {
                     .collect_view()}
             </div>
             <Divider/>
-            <ReadMore this_article=article/>
+            <ReadMore this_article=article()/>
         </div>
     }
 }
@@ -195,11 +202,15 @@ pub fn Footer() -> impl IntoView {
     view! {
         <footer class="flex flex-col p-4 text-white bg-black">
             <A href="/">
-            <Heading>
-                <div class="capitalize font-blackletter">"The Yesterday"</div>
-            </Heading>
+                <Heading>
+                    <div class="capitalize font-blackletter">"The Yesterday"</div>
+                </Heading>
             </A>
-            "Copyright \u{a9} 2024"
+            <Divider light=true/>
+            <div class="flex justify-between">
+                <div>"Copyright \u{a9} 2024"</div>
+                <div>"Brought to you by incredible reporters (and some credible ones)."</div>
+            </div>
         </footer>
     }
 }
