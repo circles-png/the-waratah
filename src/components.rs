@@ -46,7 +46,7 @@ pub fn Header() -> impl IntoView {
 pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
         <main class="flex justify-center p-4 grow">
-            <div class="max-w-3xl">{children()}</div>
+            <div class="max-w-2xl">{children()}</div>
         </main>
     }
 }
