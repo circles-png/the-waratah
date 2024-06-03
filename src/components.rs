@@ -16,7 +16,7 @@ pub fn App() -> impl IntoView {
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
-                    <Routes>
+                    <Routes base=option_env!("BASE_URL").unwrap_or_default().to_string()>
                         <Route path="/" view=ArticlePreviews/>
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/*" view=|| "404"/>
