@@ -57,6 +57,7 @@ pub fn ArticlePreviews() -> impl IntoView {
         <div class="flex flex-col gap-2">
             <div class="flex flex-col gap-2">
                 <Heading>"Articles"</Heading>
+                <Divider/>
                 <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
                     {ARTICLES
                         .iter()
@@ -193,9 +194,11 @@ pub fn Heading(children: Children) -> impl IntoView {
 pub fn Footer() -> impl IntoView {
     view! {
         <footer class="flex flex-col p-4 text-white bg-black">
+            <A href="/">
             <Heading>
                 <div class="capitalize font-blackletter">"The Yesterday"</div>
             </Heading>
+            </A>
             "Copyright \u{a9} 2024"
         </footer>
     }
