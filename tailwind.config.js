@@ -9,7 +9,7 @@ module.exports = {
       fontFamily: {
         'blackletter': ["Unifraktur Maguntia"],
         'sans': ["PT Sans"],
-        'serif': ["Times New Roman"],
+        'serif': ["PT Serif"],
       }
     },
   },
