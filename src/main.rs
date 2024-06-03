@@ -37,16 +37,16 @@ fn main() {
 
 #[allow(non_snake_case)]
 mod components {
-    use crate::article::Fragment;
+    use crate::article::{Fragment, Image};
     use crate::{article::Article, ARTICLES};
     use chrono::Local;
-    use leptos::{
-        component, leptos_dom::is_dev, view, Children, CollectView, IntoView, Params,
-        SignalWithUntracked,
-    };
+
+    use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWithUntracked};
     use leptos_router::Params;
     use leptos_router::A;
     use leptos_router::{use_params, Route, Router, Routes};
+    use rand::seq::SliceRandom;
+    use rand::thread_rng;
 
     #[component]
     pub fn App() -> impl IntoView {
@@ -62,6 +62,7 @@ mod components {
                                     view! { <ArticlePreviews/> }
                                 }
                             />
+
                             <Route path="/articles/:id" view=Article/>
                             <Route path="/*" view=|| "404"/>
                         </Routes>
@@ -102,7 +103,7 @@ mod components {
                     <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
                         {ARTICLES
                             .iter()
-                            .map(|article| view! { <ArticlePreview article=article/> })
+                            .map(|article| view! { <ArticlePreview article=article.clone()/> })
                             .collect_view()}
                     </div>
                 </div>
@@ -111,10 +112,11 @@ mod components {
     }
 
     #[component]
-    pub fn ArticlePreview(article: &'static Article) -> impl IntoView {
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn ArticlePreview(article: Article) -> impl IntoView {
         view! {
             <A class="flex flex-col gap-2 size-full" href=format!("/articles/{}", article.id)>
-                <img src=article.image_url alt=article.title/>
+                <img src=article.image.url alt=article.title/>
                 <div>
                     <small class="text-xs font-light text-blue-800">"ARTICLE"</small>
                     <Heading>
@@ -147,7 +149,10 @@ mod components {
                         " min read"
                     </div>
                 </div>
-                <img src=article.image_url alt=article.title class="object-cover w-full px-16"/>
+                <div class="px-16">
+                    <img src=article.image.url alt=article.title class="object-cover w-full"/>
+                    <Caption>{article.image.caption}</Caption>
+                </div>
                 <Divider/>
                 <div class="flex flex-col gap-4
                 [&>div:first-child>p]:first-letter:text-5xl
@@ -161,10 +166,11 @@ mod components {
                         .iter()
                         .map(|fragment| {
                             match fragment {
-                                Fragment::Image(source) => {
+                                Fragment::Image(Image { url, caption }) => {
                                     view! {
                                         <div class="px-16">
-                                            <img src=*source class="object-cover w-full"/>
+                                            <img src=*url class="object-cover w-full"/>
+                                            <Caption>{*caption}</Caption>
                                         </div>
                                     }
                                 }
@@ -201,14 +207,20 @@ mod components {
             <div class="flex flex-col gap-2">
                 <Heading>"Read More"</Heading>
                 <div class="flex w-1/3 gap-2">
-                    {ARTICLES
-                        .iter()
-                        .filter(|article| *article != this_article)
-                        .take(5)
-                        .map(|article| {
-                            view! { <ArticlePreview article=article/> }
-                        })
-                        .collect_view()}
+
+                    {
+                        let mut articles = ARTICLES.to_vec();
+                        articles.shuffle(&mut thread_rng());
+                        articles
+                            .into_iter()
+                            .filter(|article| *article != *this_article)
+                            .take(5)
+                            .map(|article| {
+                                view! { <ArticlePreview article=article/> }
+                            })
+                            .collect_view()
+                    }
+
                 </div>
             </div>
         }
@@ -219,6 +231,7 @@ mod components {
         view! { <h1 class="font-serif text-3xl font-medium uppercase">{children()}</h1> }
     }
 
+    #[component]
     pub fn Footer() -> impl IntoView {
         view! {
             <footer class="flex flex-col p-4 text-white bg-black">
@@ -227,5 +240,10 @@ mod components {
                 "Copyright \u{a9} 2024"
             </footer>
         }
+    }
+
+    #[component]
+    pub fn Caption(children: Children) -> impl IntoView {
+        view! { <caption class="block w-full py-2 text-xs text-right opacity-50">{children()}</caption> }
     }
 }

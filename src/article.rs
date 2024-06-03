@@ -1,18 +1,23 @@
-
 use anyhow::{anyhow, Result};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Article {
     pub id: &'static str,
     pub title: &'static str,
-    pub image_url: &'static str,
+    pub image: Image,
     pub fragments: Vec<Fragment>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Fragment {
     Text(&'static str),
-    Image(&'static str),
+    Image(Image),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Image {
+    pub url: &'static str,
+    pub caption: &'static str,
 }
 
 impl Fragment {
@@ -28,8 +33,15 @@ impl Fragment {
 impl Article {
     pub fn from_str(s: &'static str) -> Result<Self> {
         let mut lines = s.lines();
-        let (id, title) = lines.next().ok_or_else(|| anyhow!("no data"))?.split_once(' ').ok_or_else(|| anyhow!("no title"))?;
-        let image_url = lines.next().ok_or_else(|| anyhow!("no image"))?;
+        let (id, title) = lines
+            .next()
+            .ok_or_else(|| anyhow!("no data"))?
+            .split_once(' ')
+            .ok_or_else(|| anyhow!("no title"))?;
+        let image = Image {
+            url: lines.next().ok_or_else(|| anyhow!("no image"))?,
+            caption: lines.next().ok_or_else(|| anyhow!("no image title"))?,
+        };
         let fragments: Vec<_> = lines.collect();
         let fragments: Result<Vec<_>> = fragments
             .split(|line| line.is_empty())
@@ -40,7 +52,10 @@ impl Article {
                         .ok_or_else(|| anyhow!("no fragment data"))?
                     {
                         "text" => Fragment::Text(fragment[1]),
-                        "image" => Fragment::Image(fragment[1]),
+                        "image" => Fragment::Image(Image {
+                            url: fragment[1],
+                            caption: fragment[2],
+                        }),
                         _ => unreachable!(),
                     },
                 )
@@ -51,7 +66,7 @@ impl Article {
         Ok(Self {
             id,
             title,
-            image_url,
+            image,
             fragments,
         })
     }
