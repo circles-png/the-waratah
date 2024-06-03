@@ -12,11 +12,11 @@ use rand::thread_rng;
 #[component]
 pub fn App() -> impl IntoView {
     view! {
-        <Router base="/the-yesterday">
+        <Router base="the-yesterday">
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
-                    <Routes>
+                    <Routes base="the-yesterday".to_string()>
                         <Route
                             path="/"
                             view=|| {
@@ -85,6 +85,7 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
                 <Heading>
                     <div class="text-xl">{article.title}</div>
                 </Heading>
+                <Caption>{article.blurb}</Caption>
             </div>
         </A>
     }
@@ -118,11 +119,11 @@ pub fn Article() -> impl IntoView {
             </div>
             <Divider/>
             <div class="flex flex-col gap-4 text-lg
-            [&>div:first-child>p]:first-letter:text-5xl
+            [&>div:first-child>p]:first-letter:text-[3.5rem]
             [&>div:first-child>p]:first-letter:leading-none
             [&>div:first-child>p]:first-letter:font-bold
             [&>div:first-child>p]:first-letter:float-left
-            [&>div:first-child>p]:first-letter:pr-1">
+            [&>div:first-child>p]:first-letter:pr-2">
                 {article
                     .fragments
                     .iter()
@@ -168,7 +169,7 @@ pub fn ReadMore(this_article: &'static Article) -> impl IntoView {
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="flex w-1/3 gap-2">
+            <div class="flex gap-2 [&>*]:w-1/3">
 
                 {
                     let mut articles = ARTICLES.to_vec();
