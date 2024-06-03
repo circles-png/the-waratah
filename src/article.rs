@@ -1,3 +1,4 @@
+use lazy_static::lazy_static;
 use anyhow::{anyhow, Result};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -81,4 +82,25 @@ impl Article {
     pub fn reading_time(&self) -> usize {
         self.text_len().div_ceil(200)
     }
+}
+
+lazy_static! {
+    pub static ref ARTICLES: &'static [Article] = (|| -> Result<&'static [Article]> {
+        let mut data = include_str!(concat!(env!("OUT_DIR"), "/articles"));
+        let mut articles = Vec::new();
+        while !data.is_empty() {
+            let (length, rest) = data
+                .split_once(' ')
+                .ok_or_else(|| anyhow!("invalid data"))?;
+            let length: usize = length.parse()?;
+            let article = Article::from_str(&rest[..length])?;
+            articles.push(article);
+            data = rest
+                .get(length + 1..)
+                .or_else(|| rest.get(length..))
+                .unwrap();
+        }
+        Ok(articles.leak())
+    })()
+    .unwrap();
 }
