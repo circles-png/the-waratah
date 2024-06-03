@@ -14,7 +14,7 @@ use rand::thread_rng;
 pub fn App() -> impl IntoView {
     log!("{}", option_env!("BASE_URL").unwrap_or_default().to_string());
     view! {
-        <Router>
+        <Router base=option_env!("BASE_URL").unwrap_or_default()>
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
