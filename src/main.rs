@@ -76,7 +76,7 @@ mod components {
     #[component]
     pub fn Header() -> impl IntoView {
         view! {
-            <header class="relative p-4 text-white bg-black">
+            <header class="relative p-4 text-white bg-black font=">
                 <div class="md:absolute">{Local::now().format("%B %-d, %Y").to_string()}</div>
                 <A class="w-full text-center" href="/">
                     <Heading>"The Yesterday"</Heading>
