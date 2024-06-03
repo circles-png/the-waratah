@@ -1,9 +1,10 @@
-use lazy_static::lazy_static;
 use anyhow::{anyhow, Result};
+use lazy_static::lazy_static;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Article {
     pub id: &'static str,
+    pub blurb: &'static str,
     pub title: &'static str,
     pub image: Image,
     pub fragments: Vec<Fragment>,
@@ -39,6 +40,7 @@ impl Article {
             .ok_or_else(|| anyhow!("no data"))?
             .split_once(' ')
             .ok_or_else(|| anyhow!("no title"))?;
+        let blurb = lines.next().ok_or_else(|| anyhow!("no blurb"))?;
         let image = Image {
             url: lines.next().ok_or_else(|| anyhow!("no image"))?,
             caption: lines.next().ok_or_else(|| anyhow!("no image title"))?,
@@ -66,6 +68,7 @@ impl Article {
 
         Ok(Self {
             id,
+            blurb,
             title,
             image,
             fragments,
