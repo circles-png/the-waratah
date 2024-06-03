@@ -34,7 +34,7 @@ pub fn Header() -> impl IntoView {
         <header class="relative p-4 text-white bg-black">
             <div class="inset-0 flex items-center justify-between md:p-4 md:absolute">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
-                <div>"Tagline"</div>
+                <div>"Trusted by tens."</div>
             </div>
             <A class="w-full text-center" href="/">
                 <Heading>
