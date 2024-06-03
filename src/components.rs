@@ -102,7 +102,8 @@ pub fn Article() -> impl IntoView {
             <div>
                 <Heading>{article.title.to_uppercase()}</Heading>
                 <div class="flex gap-1 text-sm font-light">
-                    <div class="text-blue-800">"ARTICLE \u{b7}"</div>
+                    <div class="text-blue-800">"ARTICLE"</div>
+                    "\u{b7} "
                     {article.reading_time()}
                     " min read"
                 </div>
