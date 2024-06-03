@@ -75,7 +75,7 @@ impl Article {
         })
     }
 
-    pub fn text_len(&self) -> usize {
+    pub fn words(&self) -> usize {
         self.fragments
             .iter()
             .filter_map(|fragment| {
@@ -88,7 +88,7 @@ impl Article {
 
     pub fn reading_time(&self) -> usize {
         const AVERAGE_ADULT_READING_SPEED: usize = 238;
-        self.text_len().div_ceil(AVERAGE_ADULT_READING_SPEED)
+        self.words().div_ceil(AVERAGE_ADULT_READING_SPEED)
     }
 }
 
