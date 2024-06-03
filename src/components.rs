@@ -2,6 +2,7 @@ use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
 
+use leptos::logging::log;
 use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWith};
 use leptos_router::Params;
 use leptos_router::A;
@@ -11,6 +12,7 @@ use rand::thread_rng;
 
 #[component]
 pub fn App() -> impl IntoView {
+    log!("{}", option_env!("BASE_URL").unwrap_or_default().to_string());
     view! {
         <Router>
             <div class="flex flex-col h-full">
