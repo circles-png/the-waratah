@@ -51,7 +51,7 @@ pub fn Header() -> impl IntoView {
 pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
         <main class="flex justify-center p-4 grow">
-            <div class="max-w-3xl">{children()}</div>
+            <div class="max-w-2xl">{children()}</div>
         </main>
     }
 }
@@ -62,6 +62,7 @@ pub fn ArticlePreviews() -> impl IntoView {
         <div class="flex flex-col gap-2">
             <div class="flex flex-col gap-2">
                 <Heading>"Articles"</Heading>
+                <Divider/>
                 <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
                     {ARTICLES
                         .iter()
@@ -195,16 +196,18 @@ pub fn ReadMore(this_article: &'static Article) -> impl IntoView {
 
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
-    view! { <h1 class="font-serif text-3xl font-medium uppercase">{children()}</h1> }
+    view! { <h1 class="font-serif text-4xl font-medium uppercase">{children()}</h1> }
 }
 
 #[component]
 pub fn Footer() -> impl IntoView {
     view! {
         <footer class="flex flex-col p-4 text-white bg-black">
-            <Heading>
-                <div class="capitalize font-blackletter">"The Yesterday"</div>
-            </Heading>
+            <A href="/">
+                <Heading>
+                    <div class="capitalize font-blackletter">"The Yesterday"</div>
+                </Heading>
+            </A>
             <Divider light=true/>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
