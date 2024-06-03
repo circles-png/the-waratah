@@ -154,13 +154,7 @@ mod components {
                     <Caption>{article.image.caption}</Caption>
                 </div>
                 <Divider/>
-                <div class="flex flex-col gap-4
-                [&>div:first-child>p]:first-letter:text-5xl
-                [&>div:first-child>p]:first-letter:leading-none
-                [&>div:first-child>p]:first-letter:font-serif
-                [&>div:first-child>p]:first-letter:font-bold
-                [&>div:first-child>p]:first-letter:float-left
-                [&>div:first-child>p]:first-letter:pr-1">
+                <div class="flex flex-col gap-4">
                     {article
                         .fragments
                         .iter()
