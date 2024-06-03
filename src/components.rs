@@ -35,7 +35,7 @@ pub fn Header() -> impl IntoView {
             <div class="md:absolute">{Local::now().format("%B %-d, %Y").to_string()}</div>
             <A class="w-full text-center" href="/">
                 <Heading>
-                    <div class="capitalize text-5xl font-blackletter">"The Yesterday"</div>
+                    <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
                 </Heading>
             </A>
         </header>
@@ -79,7 +79,7 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
                 <Heading>
                     <div class="text-xl">{article.title}</div>
                 </Heading>
-                <Caption>{article.blurb}</Caption>
+                <Caption><div class="text-left">{article.blurb}</div></Caption>
             </div>
         </A>
     }
