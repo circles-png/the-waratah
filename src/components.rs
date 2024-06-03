@@ -32,7 +32,7 @@ pub fn App() -> impl IntoView {
 pub fn Header() -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
-            <div class="inset-0 flex items-center justify-between md:p-4 md:absolute">
+            <div class="inset-0 flex items-center justify-between pointer-events-none md:p-4 md:absolute">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
                 <div>"Trusted by tens."</div>
             </div>
