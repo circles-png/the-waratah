@@ -75,11 +75,11 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
         <A class="flex flex-col gap-2 size-full" href=format!("/articles/{}", article.id)>
             <img src=article.image.url alt=article.title/>
             <div>
-                <small class="text-xs font-light text-blue-800">"ARTICLE"</small>
+                <small class="text-sm font-light text-blue-800">"ARTICLE"</small>
                 <Heading>
                     <div class="text-xl">{article.title}</div>
                 </Heading>
-                <Caption><div class="text-left">{article.blurb}</div></Caption>
+                <Caption><div class="text-left text-sm">{article.blurb}</div></Caption>
             </div>
         </A>
     }
@@ -101,7 +101,7 @@ pub fn Article() -> impl IntoView {
         <div class="flex flex-col gap-4">
             <div>
                 <Heading>{article.title.to_uppercase()}</Heading>
-                <div class="flex gap-1 text-xs font-light">
+                <div class="flex gap-1 text-sm font-light">
                     <div class="text-blue-800">"ARTICLE \u{b7}"</div>
                     {article.reading_time()}
                     " min read"
@@ -203,5 +203,5 @@ pub fn Footer() -> impl IntoView {
 
 #[component]
 pub fn Caption(children: Children) -> impl IntoView {
-    view! { <caption class="block w-full py-2 text-xs text-right opacity-50">{children()}</caption> }
+    view! { <caption class="block w-full py-2 text-sm text-right opacity-50">{children()}</caption> }
 }
