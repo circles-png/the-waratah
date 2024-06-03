@@ -40,7 +40,9 @@ pub fn Header() -> impl IntoView {
         <header class="relative p-4 text-white bg-black">
             <div class="md:absolute">{Local::now().format("%B %-d, %Y").to_string()}</div>
             <A class="w-full text-center" href="/">
-                <Heading>"The Yesterday"</Heading>
+                <Heading>
+                    <div class="capitalize font-blackletter">"The Yesterday"</div>
+                </Heading>
             </A>
         </header>
     }
@@ -118,7 +120,6 @@ pub fn Article() -> impl IntoView {
             <div class="flex flex-col gap-4
             [&>div:first-child>p]:first-letter:text-5xl
             [&>div:first-child>p]:first-letter:leading-none
-            [&>div:first-child>p]:first-letter:font-serif
             [&>div:first-child>p]:first-letter:font-bold
             [&>div:first-child>p]:first-letter:float-left
             [&>div:first-child>p]:first-letter:pr-1">
@@ -196,7 +197,9 @@ pub fn Heading(children: Children) -> impl IntoView {
 pub fn Footer() -> impl IntoView {
     view! {
         <footer class="flex flex-col p-4 text-white bg-black">
-            <Heading>"The Yesterday"</Heading>
+            <Heading>
+                <div class="capitalize font-blackletter">"The Yesterday"</div>
+            </Heading>
             <Divider light=true/>
             "Copyright \u{a9} 2024"
         </footer>

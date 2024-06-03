@@ -5,7 +5,12 @@ module.exports = {
     "src/**/*.rs",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'blackletter': ["Unifraktur Maguntia"],
+        'sans': ["ui-serif", "serif"],
+      }
+    },
   },
   plugins: [],
 }

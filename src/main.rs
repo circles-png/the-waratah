@@ -1,6 +1,5 @@
 use crate::components::App;
 use console_error_panic_hook::set_once;
-use crossword::Crossword;
 use leptos::{mount_to_body, view};
 
 mod article;
