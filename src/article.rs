@@ -78,7 +78,11 @@ impl Article {
     pub fn text_len(&self) -> usize {
         self.fragments
             .iter()
-            .filter_map(|fragment| fragment.as_text().map(|text| text.len()))
+            .filter_map(|fragment| {
+                fragment
+                    .as_text()
+                    .map(|text| text.split_ascii_whitespace().count())
+            })
             .sum()
     }
 
