@@ -169,7 +169,7 @@ pub fn ReadMore(this_article: &'static Article) -> impl IntoView {
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="flex w-1/3 gap-2">
+            <div class="flex gap-2 [&>*]:w-1/3">
 
                 {
                     let mut articles = ARTICLES.to_vec();
