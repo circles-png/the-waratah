@@ -34,8 +34,9 @@ pub fn App() -> impl IntoView {
 pub fn Header() -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
-            <div class="inset-0 flex items-center pointer-events-none md:p-4 md:absolute">
+            <div class="inset-0 flex items-center justify-between pointer-events-none md:p-4 md:absolute">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
+                <div>"Est. 2024"</div>
             </div>
             <A class="w-full text-center" href="/">
                 <Heading>
@@ -43,9 +44,6 @@ pub fn Header() -> impl IntoView {
                     <div class="font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </A>
-            <div class="inset-0 flex items-center pointer-events-none md:p-4 md:absolute justify-end">
-                <div>"Est. 2024"</div>
-            </div>
         </header>
     }
 }
