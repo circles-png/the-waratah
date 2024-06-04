@@ -125,6 +125,7 @@ pub fn Article() -> impl IntoView {
             [&>div:first-child>p]:first-letter:text-[3.5rem]
             [&>div:first-child>p]:first-letter:leading-none
             [&>div:first-child>p]:first-letter:font-bold
+            [&>div:first-child>p]:first-letter:font-serif
             [&>div:first-child>p]:first-letter:float-left
             [&>div:first-child>p]:first-letter:pr-2">
                 {article()
