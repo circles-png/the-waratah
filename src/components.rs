@@ -39,7 +39,11 @@ pub fn Header() -> impl IntoView {
         <header class="relative p-4 text-white bg-black">
             <div class="inset-0 flex items-center justify-between pointer-events-none md:p-4 md:absolute">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
-                <A href="https://angusmason.github.io/theaccountgame" target="_blank" class="pointer-events-auto">
+                <A
+                    href="https://angusmason.github.io/theaccountgame"
+                    target="_blank"
+                    class="pointer-events-auto"
+                >
                     "Sign up"
                 </A>
             </div>
@@ -230,21 +234,20 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="w-full overflow-auto">
-                <div class="grid w-full grid-flow-col grid-rows-1 gap-2 [&>*]:w-48 sm:[&>*]:w-64">
-                    {move || {
-                        let mut articles = ARTICLES.to_vec();
-                        articles.shuffle(&mut thread_rng());
-                        articles
-                            .into_iter()
-                            .filter(|article| *article != *this_article())
-                            .take(5)
-                            .map(|article| {
-                                view! { <ArticlePreview article=article/> }
-                            })
-                            .collect_view()
-                    }}
-                </div>
+            <div class="flex [&>*]:shrink-0 overflow-auto w-full gap-2 [&>*]:w-48 sm:[&>*]:w-64">
+                {move || {
+                    let mut articles = ARTICLES.to_vec();
+                    articles.shuffle(&mut thread_rng());
+                    articles
+                        .into_iter()
+                        .filter(|article| *article != *this_article())
+                        .take(5)
+                        .map(|article| {
+                            view! { <ArticlePreview article=article/> }
+                        })
+                        .collect_view()
+                }}
+
             </div>
         </div>
     }
@@ -266,7 +269,9 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                <div class="hidden sm:block">"Brought to you by incredible (and few credible) reporters."</div>
+                <div class="hidden sm:block">
+                    "Brought to you by incredible (and few credible) reporters."
+                </div>
             </div>
         </footer>
     }
