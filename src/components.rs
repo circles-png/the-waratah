@@ -44,7 +44,7 @@ pub fn Header() -> impl IntoView {
                     target="_blank"
                     class="pointer-events-auto"
                 >
-                    "Sign up"
+                    "Sign Up"
                 </A>
             </div>
             <A class="w-full text-center" href="/">
