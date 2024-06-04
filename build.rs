@@ -6,17 +6,27 @@ use std::{
 
 fn main() {
     println!("cargo:rerun-if-changed=src/articles");
-    let articles: Vec<_> = read_dir("src/articles")
-        .unwrap()
-        .map(|entry| {
-            let entry = entry.unwrap();
-            let article = read_to_string(entry.path()).unwrap();
-            format!(
-                "{} {} {}",
-                article.len() + 1 + entry.file_name().len(),
-                entry.file_name().to_string_lossy(),
-                article
-            )
+    let topics = read_dir("src/articles").unwrap();
+    let articles: Vec<_> = topics
+        .flat_map(|topic_entry| {
+            let topic_entry = &topic_entry.unwrap();
+            read_dir(topic_entry.path())
+                .unwrap()
+                .map(|article_entry| {
+                    let entry = article_entry.unwrap();
+                    let article = read_to_string(entry.path()).unwrap();
+                    let topic = topic_entry.file_name();
+                    let topic = topic.to_string_lossy();
+                    let data = format!(
+                        "{} {} {} {}",
+                        topic.len(),
+                        topic,
+                        entry.file_name().to_string_lossy(),
+                        article
+                    );
+                    format!("{} {}", data.len(), data)
+                })
+                .collect::<Vec<_>>()
         })
         .collect();
     let articles = articles.join("\n");

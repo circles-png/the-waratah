@@ -4,6 +4,7 @@ use lazy_static::lazy_static;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Article {
     pub id: &'static str,
+    pub topic: &'static str,
     pub blurb: &'static str,
     pub title: &'static str,
     pub image: Image,
@@ -35,11 +36,16 @@ impl Fragment {
 impl Article {
     pub fn from_str(s: &'static str) -> Result<Self> {
         let mut lines = s.lines();
-        let (id, title) = lines
-            .next()
-            .ok_or_else(|| anyhow!("no data"))?
+        let first = lines.next().ok_or_else(|| anyhow!("no data"))?;
+        let (topic_len, rest) = first
             .split_once(' ')
-            .ok_or_else(|| anyhow!("no title"))?;
+            .ok_or_else(|| anyhow!("invalid data"))?;
+        let topic_len: usize = topic_len.parse()?;
+        let topic = &rest[..topic_len];
+        let rest = &rest[topic_len + 1..];
+        let (id, title) = rest
+            .split_once(' ')
+            .ok_or_else(|| anyhow!("invalid data"))?;
         let blurb = lines.next().ok_or_else(|| anyhow!("no blurb"))?;
         let image = Image {
             url: lines.next().ok_or_else(|| anyhow!("no image"))?,
@@ -68,6 +74,7 @@ impl Article {
 
         Ok(Self {
             id,
+            topic,
             blurb,
             title,
             image,
