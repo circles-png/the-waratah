@@ -28,6 +28,8 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      BASE_URL: /the-yesterday
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
