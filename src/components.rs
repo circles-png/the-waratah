@@ -83,10 +83,10 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
             <div>
                 <small class="text-sm font-light text-blue-800">"ARTICLE"</small>
                 <Heading>
-                    <div class="text-xl">{article.title}</div>
+                    <div class="text-xl text-balance">{article.title}</div>
                 </Heading>
                 <Caption>
-                    <div class="text-sm text-left">{article.blurb}</div>
+                    <div class="text-sm text-left text-pretty">{article.blurb}</div>
                 </Caption>
             </div>
         </A>
