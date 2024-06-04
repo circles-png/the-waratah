@@ -40,7 +40,7 @@ pub fn Header() -> impl IntoView {
             <A class="w-full text-center" href="/">
                 <Heading>
                     <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
-                    <div class="font-serif text-base">"Trusted by tens."</div>
+                    <div class="font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </A>
         </header>
