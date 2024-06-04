@@ -43,6 +43,9 @@ pub fn Header() -> impl IntoView {
                     <div class="font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </A>
+            <div class="inset-0 flex items-center pointer-events-none md:p-4 md:absolute justify-end">
+                <div>"Est. 2024"</div>
+            </div>
         </header>
     }
 }
