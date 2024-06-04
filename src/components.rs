@@ -45,8 +45,8 @@ pub fn Header() -> impl IntoView {
             </div>
             <A class="w-full text-center" href="/">
                 <Heading>
-                    <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
-                    <div class="font-serif text-base">"Trusted by dozens."</div>
+                    <div class="capitalize sm:text-5xl font-blackletter">"The Yesterday"</div>
+                    <div class="hidden font-serif text-base sm:block">"Trusted by dozens."</div>
                 </Heading>
             </A>
         </header>
@@ -57,7 +57,7 @@ pub fn Header() -> impl IntoView {
 pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
         <main class="flex justify-center p-4 grow">
-            <div class="max-w-2xl">{children()}</div>
+            <div class="w-full max-w-2xl">{children()}</div>
         </main>
     }
 }
@@ -165,7 +165,7 @@ pub fn Article() -> impl IntoView {
                     " min read"
                 </div>
             </div>
-            <div class="px-16">
+            <div class="sm:px-16">
                 <img
                     src=move || article().image.url
                     alt=move || article().title
@@ -174,8 +174,9 @@ pub fn Article() -> impl IntoView {
                 <Caption>{move || article().image.caption}</Caption>
             </div>
             <Divider/>
-            <div class="flex flex-col gap-5 text-lg
-            [&>div:first-child>p]:first-letter:text-[3.5rem]
+            <div class="flex flex-col gap-5 sm:text-lg
+            [&>div:first-child>p]:first-letter:text-[2.8rem]
+            sm:[&>div:first-child>p]:first-letter:text-[3.5rem]
             [&>div:first-child>p]:first-letter:leading-none
             [&>div:first-child>p]:first-letter:font-bold
             [&>div:first-child>p]:first-letter:font-serif
@@ -229,21 +230,21 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="flex gap-2 [&>*]:w-1/3">
-
-                {move || {
-                    let mut articles = ARTICLES.to_vec();
-                    articles.shuffle(&mut thread_rng());
-                    articles
-                        .into_iter()
-                        .filter(|article| *article != *this_article())
-                        .take(5)
-                        .map(|article| {
-                            view! { <ArticlePreview article=article/> }
-                        })
-                        .collect_view()
-                }}
-
+            <div class="w-full overflow-auto">
+                <div class="grid w-full grid-flow-col grid-rows-1 gap-2 [&>*]:w-48 sm:[&>*]:w-64">
+                    {move || {
+                        let mut articles = ARTICLES.to_vec();
+                        articles.shuffle(&mut thread_rng());
+                        articles
+                            .into_iter()
+                            .filter(|article| *article != *this_article())
+                            .take(5)
+                            .map(|article| {
+                                view! { <ArticlePreview article=article/> }
+                            })
+                            .collect_view()
+                    }}
+                </div>
             </div>
         </div>
     }
@@ -251,7 +252,7 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
 
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
-    view! { <h1 class="font-serif text-4xl font-medium uppercase">{children()}</h1> }
+    view! { <h1 class="font-serif text-2xl font-medium uppercase sm:text-4xl">{children()}</h1> }
 }
 
 #[component]
@@ -265,7 +266,7 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                <div>"Brought to you by incredible (and few credible) reporters."</div>
+                <div class="hidden sm:block">"Brought to you by incredible (and few credible) reporters."</div>
             </div>
         </footer>
     }
