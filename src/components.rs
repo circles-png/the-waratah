@@ -262,7 +262,7 @@ pub fn Footer() -> impl IntoView {
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
                 <div class="hidden sm:block">
-                    "Brought to you by incredible (and few credible) reporters."
+                    "Brought to you by incredible (and a few credible) reporters."
                 </div>
             </div>
         </footer>
