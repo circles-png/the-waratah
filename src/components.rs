@@ -247,7 +247,7 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="flex flex-col w-full gap-2 [&_img]:w-1/2">
+            <div class="flex flex-col w-full gap-2 [&_img]:w-1/4">
                 {move || {
                     let mut articles = ARTICLES.to_vec();
                     articles.shuffle(&mut thread_rng());
