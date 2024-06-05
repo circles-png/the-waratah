@@ -36,7 +36,7 @@ pub fn App() -> impl IntoView {
 pub fn Header() -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
-            <div class="inset-0 flex items-center justify-between pointer-events-none md:p-4 md:absolute">
+            <div class="inset-0 items-center justify-between hidden pointer-events-none sm:p-4 sm:absolute sm:flex">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
                 <A
                     href="https://angusmason.github.io/theaccountgame"
@@ -48,8 +48,8 @@ pub fn Header() -> impl IntoView {
             </div>
             <A class="w-full text-center" href="/">
                 <Heading>
-                    <div class="capitalize sm:text-5xl font-blackletter">"The Yesterday"</div>
-                    <div class="hidden font-serif text-base sm:block">"Trusted by dozens."</div>
+                    <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="block font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </A>
         </header>
