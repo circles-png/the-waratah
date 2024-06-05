@@ -15,6 +15,7 @@ fn main() {
                 .map(|article_entry| {
                     let entry = article_entry.unwrap();
                     let article = read_to_string(entry.path()).unwrap();
+                    let article = article.trim();
                     let topic = topic_entry.file_name();
                     let topic = topic.to_string_lossy();
                     let data = format!(
