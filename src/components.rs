@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use std::iter::once;
+use std::ops::Not;
 
 use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
@@ -72,7 +73,7 @@ pub fn ArticlePreviews() -> impl IntoView {
     view! {
         <div class="flex flex-col gap-2">
             <div class="flex flex-col gap-2">
-                <Heading>"Articles"</Heading>
+                <Heading>"Latest"</Heading>
                 <Divider/>
                 <div class="flex [&>*]:px-4 divide-x">
 
@@ -125,7 +126,7 @@ pub fn ArticlePreviews() -> impl IntoView {
 
 #[component]
 #[allow(clippy::needless_pass_by_value)]
-pub fn ArticlePreview(article: Article) -> impl IntoView {
+pub fn ArticlePreview(article: Article, #[prop(optional)] no_blurb: bool) -> impl IntoView {
     view! {
         <A class="flex flex-col gap-2 size-full" href=format!("/articles/{}", article.id)>
             <img src=article.image.url alt=article.title/>
@@ -136,9 +137,9 @@ pub fn ArticlePreview(article: Article) -> impl IntoView {
                 <Heading>
                     <article class="text-xl">{article.title}</article>
                 </Heading>
-                <Caption>
+                {no_blurb.not().then_some(view!{<Caption>
                     <div class="text-sm text-left">{article.blurb}</div>
-                </Caption>
+                </Caption>})}
             </div>
         </A>
     }
