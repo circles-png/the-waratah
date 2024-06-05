@@ -6,6 +6,11 @@ use std::{
 
 fn main() {
     println!("cargo:rerun-if-changed=src/articles");
+    collect_articles();
+    collect_ads();
+}
+
+fn collect_articles() {
     let topics = read_dir("src/articles").unwrap();
     let articles: Vec<_> = topics
         .flat_map(|topic_entry| {
@@ -34,5 +39,17 @@ fn main() {
     File::create(var("OUT_DIR").unwrap() + "/articles")
         .unwrap()
         .write_all(articles.as_bytes())
+        .unwrap();
+}
+
+fn collect_ads() {
+    let ads: Vec<_> = read_dir("src/images/ads")
+        .unwrap()
+        .map(|entry| entry.unwrap().file_name().to_string_lossy().to_string())
+        .collect();
+    let ads = ads.join("\n");
+    File::create(var("OUT_DIR").unwrap() + "/ads")
+        .unwrap()
+        .write_all(ads.as_bytes())
         .unwrap();
 }

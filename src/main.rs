@@ -6,6 +6,7 @@ mod article;
 #[allow(non_snake_case)]
 mod components;
 mod crossword;
+mod ad;
 
 fn main() {
     set_once();
