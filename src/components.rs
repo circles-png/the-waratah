@@ -6,14 +6,12 @@ use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
 
-use leptos::{
-    component, view, Children, CollectView, IntoView, Params, SignalWith,
-};
+use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWith};
 use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
 use rand::seq::SliceRandom;
-use rand::thread_rng;
+use rand::{random, thread_rng};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -38,7 +36,7 @@ pub fn App() -> impl IntoView {
 pub fn Header() -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
-            <div class="inset-0 flex items-center justify-between pointer-events-none md:p-4 md:absolute">
+            <div class="inset-0 items-center justify-between hidden pointer-events-none sm:p-4 sm:absolute sm:flex">
                 <div>{Local::now().format("%B %-d, %Y").to_string()}</div>
                 <A
                     href="https://angusmason.github.io/theaccountgame"
@@ -50,8 +48,8 @@ pub fn Header() -> impl IntoView {
             </div>
             <A class="w-full text-center" href="/">
                 <Heading>
-                    <div class="capitalize sm:text-5xl font-blackletter">"The Yesterday"</div>
-                    <div class="hidden font-serif text-base sm:block">"Trusted by dozens."</div>
+                    <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="block font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </A>
         </header>
@@ -61,8 +59,20 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
-        <main class="flex justify-center p-4 grow">
-            <div class="w-full max-w-2xl">{children()}</div>
+        <main class="flex justify-center gap-4 p-4 grow">
+            <div class="flex-col hidden w-full gap-4 lg:flex">
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+            </div>
+            <div class="w-full max-w-2xl shrink-0">{children()}</div>
+            <div class="flex-col hidden w-full gap-4 lg:flex">
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+            </div>
         </main>
     }
 }
