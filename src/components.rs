@@ -120,9 +120,20 @@ pub fn ArticlePreviews() -> impl IntoView {
 
 #[component]
 #[allow(clippy::needless_pass_by_value)]
-pub fn ArticlePreview(article: Article, #[prop(optional)] no_blurb: bool) -> impl IntoView {
+pub fn ArticlePreview(
+    article: Article,
+    #[prop(optional)] no_blurb: bool,
+    #[prop(optional)] horizontal: bool,
+) -> impl IntoView {
     view! {
-        <A class="flex flex-col gap-2 size-full" href=format!("/articles/{}", article.id)>
+        <A
+            class=format!(
+                "flex gap-2 size-full {}",
+                horizontal.not().then_some("flex-col").unwrap_or_default(),
+            )
+
+            href=format!("/articles/{}", article.id)
+        >
             <img src=article.image.url alt=article.title/>
             <div>
                 <small class="text-sm font-light text-blue-800">
@@ -236,16 +247,28 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
     view! {
         <div class="flex flex-col gap-2">
             <Heading>"Read More"</Heading>
-            <div class="flex [&>*]:shrink-0 overflow-auto w-full gap-2 [&>*]:w-48 sm:[&>*]:w-64">
+            <div class="flex flex-col w-full gap-2 [&_img]:w-1/2">
                 {move || {
                     let mut articles = ARTICLES.to_vec();
                     articles.shuffle(&mut thread_rng());
-                    articles
+                    let same_topic = articles
+                        .iter()
+                        .filter(|article| {
+                            **article != *this_article() && article.topic == this_article().topic
+                        })
+                        .collect_vec();
+                    let selected = if same_topic.is_empty() {
+                        articles.iter().filter(|article| **article != *this_article()).collect_vec()
+                    } else {
+                        same_topic
+                    };
+                    selected
                         .into_iter()
-                        .filter(|article| *article != *this_article())
                         .take(5)
                         .map(|article| {
-                            view! { <ArticlePreview article=article/> }
+                            view! {
+                                <ArticlePreview article=article.clone() horizontal=true no_blurb=true/>
+                            }
                         })
                         .collect_view()
                 }}
