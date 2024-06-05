@@ -6,14 +6,12 @@ use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
 
-use leptos::{
-    component, view, Children, CollectView, IntoView, Params, SignalWith,
-};
+use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWith};
 use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
 use rand::seq::SliceRandom;
-use rand::thread_rng;
+use rand::{random, thread_rng};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -61,8 +59,20 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
-        <main class="flex justify-center p-4 grow">
-            <div class="w-full max-w-2xl">{children()}</div>
+        <main class="flex justify-center gap-4 p-4 grow">
+            <div class="flex-col hidden w-full gap-4 lg:flex">
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+            </div>
+            <div class="w-full max-w-2xl shrink-0">{children()}</div>
+            <div class="flex-col hidden w-full gap-4 lg:flex">
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+            </div>
         </main>
     }
 }
