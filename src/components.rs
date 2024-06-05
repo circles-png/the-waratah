@@ -6,7 +6,9 @@ use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
 
-use leptos::{component, view, Children, CollectView, IntoView, Params, SignalWith};
+use leptos::{
+    component, create_signal, view, Children, CollectView, IntoView, Params, SignalGet, SignalWith,
+};
 use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
@@ -79,40 +81,75 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 
 #[component]
 pub fn ArticlePreviews() -> impl IntoView {
+    let (filter, set_filter) = create_signal(None::<&str>);
     view! {
         <div class="flex flex-col gap-2">
-            <div class="flex flex-col gap-2">
-                {once("Latest")
-                    .chain(ARTICLES.iter().map(|article| article.topic).unique())
+            <div class="flex *:px-2 divide-x font-serif justify-center">
+
+                {once("All")
+                    .chain(ARTICLES.iter().map(|article| article.topic))
+                    .unique()
                     .map(|topic| {
                         view! {
-                            <Heading>{topic}</Heading>
-                            <Divider/>
-                            <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
-                                {(topic == "Latest")
-                                    .then_some(
-                                        ARTICLES
-                                            .iter()
-                                            .take(6)
-                                            .map(|article| {
-                                                view! { <ArticlePreview article=article.clone()/> }
-                                            })
-                                            .collect_view(),
-                                    )}
-                                {move || {
-                                    ARTICLES
-                                        .iter()
-                                        .filter(|article| { article.topic == topic })
-                                        .map(|article| {
-                                            view! { <ArticlePreview article=article.clone()/> }
-                                        })
-                                        .collect_view()
-                                }}
+                            <button
+                                class=move || {
+                                    filter
+                                        .get()
+                                        .as_ref()
+                                        .map_or(topic == "All", |filter| topic == *filter)
+                                        .then_some("text-blue-800")
+                                }
 
-                            </div>
+                                on:click=move |_| set_filter(
+                                    if topic == "All" { None } else { Some(topic) },
+                                )
+                            >
+
+                                {topic}
+                            </button>
                         }
                     })
                     .collect_view()}
+
+            </div>
+            <div class="flex flex-col gap-2">
+                {move || {
+                    once("Latest")
+                        .chain(ARTICLES.iter().map(|article| article.topic).unique())
+                        .filter(|topic| {
+                            filter.get().as_ref().map_or(true, |filter| topic == filter)
+                        })
+                        .map(|topic| {
+                            view! {
+                                <Heading>{topic}</Heading>
+                                <Divider/>
+                                <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
+                                    {(topic == "Latest")
+                                        .then_some(
+                                            ARTICLES
+                                                .iter()
+                                                .take(6)
+                                                .map(|article| {
+                                                    view! { <ArticlePreview article=article.clone()/> }
+                                                })
+                                                .collect_view(),
+                                        )}
+                                    {move || {
+                                        ARTICLES
+                                            .iter()
+                                            .filter(|article| { article.topic == topic })
+                                            .map(|article| {
+                                                view! { <ArticlePreview article=article.clone()/> }
+                                            })
+                                            .collect_view()
+                                    }}
+
+                                </div>
+                            }
+                        })
+                        .collect_view()
+                }}
+
             </div>
         </div>
     }
@@ -128,7 +165,7 @@ pub fn ArticlePreview(
     view! {
         <A
             class=format!(
-                "flex gap-2 size-full {}",
+                "flex gap-2 {}",
                 horizontal.not().then_some("flex-col").unwrap_or_default(),
             )
 
@@ -267,7 +304,11 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
                         .take(5)
                         .map(|article| {
                             view! {
-                                <ArticlePreview article=article.clone() horizontal=true no_blurb=true/>
+                                <ArticlePreview
+                                    article=article.clone()
+                                    horizontal=true
+                                    no_blurb=true
+                                />
                             }
                         })
                         .collect_view()
