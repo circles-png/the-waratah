@@ -81,41 +81,46 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 
 #[component]
 pub fn ArticlePreviews() -> impl IntoView {
+    const ALL: &str = "All";
     let (filter, set_filter) = create_signal(None::<&str>);
     view! {
         <div class="flex flex-col gap-2">
             <div class="flex *:px-2 divide-x font-serif justify-center">
 
-                {once("All")
-                    .chain(ARTICLES.iter().map(|article| article.topic))
-                    .unique()
-                    .map(|topic| {
-                        view! {
-                            <button
-                                class=move || {
-                                    filter
+                {move || {
+                    const HOME: &str = "Home";
+                    once(HOME)
+                        .chain(ARTICLES.iter().map(|article| article.topic))
+                        .chain(once(ALL))
+                        .unique()
+                        .map(|topic| {
+                            view! {
+                                <button
+                                    class=filter
                                         .get()
                                         .as_ref()
-                                        .map_or(topic == "All", |filter| topic == *filter)
+                                        .map_or(topic == HOME, |filter| topic == *filter)
                                         .then_some("text-blue-800")
-                                }
 
-                                on:click=move |_| set_filter(
-                                    if topic == "All" { None } else { Some(topic) },
-                                )
-                            >
+                                    on:click=move |_| set_filter(
+                                        if topic == HOME { None } else { Some(topic) },
+                                    )
+                                >
 
-                                {topic}
-                            </button>
-                        }
-                    })
-                    .collect_view()}
+                                    {topic}
+                                </button>
+                            }
+                        })
+                        .collect_view()
+                }}
 
             </div>
             <div class="flex flex-col gap-2">
                 {move || {
-                    once("Latest")
+                    const LATEST: &str = "Latest";
+                    once(LATEST)
                         .chain(ARTICLES.iter().map(|article| article.topic).unique())
+                        .chain(once(ALL))
                         .filter(|topic| {
                             filter.get().as_ref().map_or(true, |filter| topic == filter)
                         })
@@ -124,24 +129,34 @@ pub fn ArticlePreviews() -> impl IntoView {
                                 <Heading>{topic}</Heading>
                                 <Divider/>
                                 <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
-                                    {(topic == "Latest")
-                                        .then_some(
+
+                                    {move || match topic {
+                                        LATEST => {
                                             ARTICLES
                                                 .iter()
                                                 .take(6)
                                                 .map(|article| {
                                                     view! { <ArticlePreview article=article.clone()/> }
                                                 })
-                                                .collect_view(),
-                                        )}
-                                    {move || {
-                                        ARTICLES
-                                            .iter()
-                                            .filter(|article| { article.topic == topic })
-                                            .map(|article| {
-                                                view! { <ArticlePreview article=article.clone()/> }
-                                            })
-                                            .collect_view()
+                                                .collect_view()
+                                        }
+                                        ALL => {
+                                            ARTICLES
+                                                .iter()
+                                                .map(|article| {
+                                                    view! { <ArticlePreview article=article.clone()/> }
+                                                })
+                                                .collect_view()
+                                        }
+                                        topic => {
+                                            ARTICLES
+                                                .iter()
+                                                .filter(|article| { article.topic == topic })
+                                                .map(|article| {
+                                                    view! { <ArticlePreview article=article.clone()/> }
+                                                })
+                                                .collect_view()
+                                        }
                                     }}
 
                                 </div>
