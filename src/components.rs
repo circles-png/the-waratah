@@ -7,7 +7,7 @@ use crate::article::{Fragment, Image};
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, Children, CollectView, IntoView, Params, SignalGet, SignalWith,
+    component, view, Children, CollectView, IntoView, Params, SignalWith,
 };
 use leptos_router::Params;
 use leptos_router::A;
@@ -69,56 +69,40 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 
 #[component]
 pub fn ArticlePreviews() -> impl IntoView {
-    let (filter, set_filter) = create_signal(None::<&str>);
     view! {
         <div class="flex flex-col gap-2">
             <div class="flex flex-col gap-2">
-                <Heading>"Latest"</Heading>
-                <Divider/>
-                <div class="flex [&>*]:px-4 divide-x">
+                {once("Latest")
+                    .chain(ARTICLES.iter().map(|article| article.topic).unique())
+                    .map(|topic| {
+                        view! {
+                            <Heading>{topic}</Heading>
+                            <Divider/>
+                            <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
+                                {(topic == "Latest")
+                                    .then_some(
+                                        ARTICLES
+                                            .iter()
+                                            .take(6)
+                                            .map(|article| {
+                                                view! { <ArticlePreview article=article.clone()/> }
+                                            })
+                                            .collect_view(),
+                                    )}
+                                {move || {
+                                    ARTICLES
+                                        .iter()
+                                        .filter(|article| { article.topic == topic })
+                                        .map(|article| {
+                                            view! { <ArticlePreview article=article.clone()/> }
+                                        })
+                                        .collect_view()
+                                }}
 
-                    {move || {
-                        once("All")
-                            .chain(ARTICLES.iter().map(|article| article.topic))
-                            .unique()
-                            .map(|topic| {
-                                view! {
-                                    <button
-                                        on:click=move |_| set_filter(
-                                            if topic == "All" { None } else { Some(topic) },
-                                        )
-
-                                        class=move || {
-                                            (topic
-                                                == filter.get().as_ref().map_or("All", |filter| *filter))
-                                                .then_some("text-blue-800")
-                                                .unwrap_or_default()
-                                        }
-                                    >
-
-                                        {topic}
-                                    </button>
-                                }
-                            })
-                            .collect_view()
-                    }}
-
-                </div>
-                <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
-                    {move || {
-                        ARTICLES
-                            .iter()
-                            .filter(|article| {
-                                filter
-                                    .get()
-                                    .as_ref()
-                                    .map_or(true, |filter| article.topic == *filter)
-                            })
-                            .map(|article| view! { <ArticlePreview article=article.clone()/> })
-                            .collect_view()
-                    }}
-
-                </div>
+                            </div>
+                        }
+                    })
+                    .collect_view()}
             </div>
         </div>
     }
@@ -137,9 +121,16 @@ pub fn ArticlePreview(article: Article, #[prop(optional)] no_blurb: bool) -> imp
                 <Heading>
                     <article class="text-xl">{article.title}</article>
                 </Heading>
-                {no_blurb.not().then_some(view!{<Caption>
-                    <div class="text-sm text-left">{article.blurb}</div>
-                </Caption>})}
+                {no_blurb
+                    .not()
+                    .then_some(
+                        view! {
+                            <Caption>
+                                <div class="text-sm text-left">{article.blurb}</div>
+                            </Caption>
+                        },
+                    )}
+
             </div>
         </A>
     }
