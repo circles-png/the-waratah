@@ -6,6 +6,7 @@ use std::{
 
 fn main() {
     println!("cargo:rerun-if-changed=src/articles");
+    println!("cargo:rerun-if-changed=src/images/ads");
     collect_articles();
     collect_ads();
 }

@@ -62,21 +62,16 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     let amount = 8;
-    let ads = ADS.choose_multiple(&mut thread_rng(), amount).collect_vec();
+    let ads = ADS.choose(&mut thread_rng());
     let half = amount / 2;
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="flex-col hidden w-full gap-4 lg:flex">
-                {ads
-                    .iter()
-                    .take(half)
-                    .map(|ad| {
-                        view! { <img src=format!("/images/ads/{}", ad)/> }
-                    })
-                    .collect_view()}
             </div>
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
             <div class="flex-col hidden w-full gap-4 lg:flex">
+            </div>
+            <div class="absolute inset-x-0 bottom-0">
                 {ads
                     .iter()
                     .skip(half)
