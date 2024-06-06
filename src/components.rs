@@ -69,9 +69,9 @@ pub fn PageContainer(children: Children) -> impl IntoView {
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
-            <div class="fixed bottom-0 z-10 p-8 bg-gray-100 border rounded-t-lg inset-x-1/4">
+            <div class="fixed bottom-0 z-10 p-2 bg-gray-100 border rounded-t-lg inset-x-1/3">
                 <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
-                <div class="absolute right-0 text-center border rounded-t-lg size-8 bottom-full">
+                <div class="absolute right-0 text-center border rounded-t-lg size-6 bottom-full bg-white">
                     "X"
                 </div>
             </div>
