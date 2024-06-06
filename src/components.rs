@@ -72,7 +72,7 @@ pub fn PageContainer(children: Children) -> impl IntoView {
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
             <div class=move || {
                 format!(
-                    "fixed p-2 bg-gray-100 border rounded-t-lg inset-x-0 sm:inset-x-1/3 transition duration-1000 ease-in bottom-0 {}",
+                    "fixed p-2 bg-gray-100 border rounded-t-lg max-w-3xl transition duration-1000 ease-in bottom-0 {}",
                     ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
                 )
             }>
