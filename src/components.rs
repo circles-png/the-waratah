@@ -2,7 +2,6 @@ use itertools::Itertools;
 use std::iter::once;
 use std::ops::Not;
 
-use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use chrono::Local;
@@ -61,29 +60,20 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    let amount = 8;
-    let ads = ADS.choose_multiple(&mut thread_rng(), amount).collect_vec();
-    let half = amount / 2;
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="flex-col hidden w-full gap-4 lg:flex">
-                {ads
-                    .iter()
-                    .take(half)
-                    .map(|ad| {
-                        view! { <img src=format!("/images/ads/{}", ad)/> }
-                    })
-                    .collect_view()}
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
             </div>
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
             <div class="flex-col hidden w-full gap-4 lg:flex">
-                {ads
-                    .iter()
-                    .skip(half)
-                    .map(|ad| {
-                        view! { <img src=format!("/images/ads/{}", ad)/> }
-                    })
-                    .collect_view()}
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
+                <div class=format!("bg-gray-200 {}", if random() { "h-64" } else { "h-32" })></div>
             </div>
         </main>
     }
