@@ -10,7 +10,7 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_effect, create_signal, view, Children, CollectView, IntoView, Params,
+    component, create_signal, view, Children, CollectView, IntoView, Params,
     SignalGet, SignalWith,
 };
 use leptos_router::Params;
@@ -76,7 +76,20 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                     ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
                 )
             }>
-                <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
+                <div class="relative">
+                    <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
+                    <div class="text-sm text-center opacity-50">"Advertisement"</div>
+                    <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500">
+                        <div class="grid border bg-gray-100/50 size-4 place-content-center">
+                            <div class="border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
+                                i
+                            </div>
+                        </div>
+                        <div class="grid border place-content-center bg-gray-100/50 size-4">
+                            "X"
+                        </div>
+                    </div>
+                </div>
                 <button
                     class="absolute right-0 text-center bg-gray-100 border rounded-t-lg size-8 bottom-full"
                     on:click=move |_| set_ad_open(false)
