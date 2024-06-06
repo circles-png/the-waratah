@@ -10,7 +10,8 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, Children, CollectView, IntoView, Params, SignalGet, SignalWith,
+    component, create_effect, create_signal, view, Children, CollectView, IntoView, Params,
+    SignalGet, SignalWith,
 };
 use leptos_router::Params;
 use leptos_router::A;
@@ -65,15 +66,23 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     let ad = ADS.choose(&mut thread_rng()).unwrap();
-    let (ad_open, set_ad_open) = create_signal(false);
+    let (ad_open, set_ad_open) = create_signal(true);
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
-            <div class="fixed bottom-0 z-10 p-8 bg-gray-100 border rounded-t-lg inset-x-1/4">
+            <div class=move || {
+                format!(
+                    "fixed p-8 bg-gray-100 border rounded-t-lg inset-x-1/4 transition duration-1000 ease-in bottom-0 {}",
+                    ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
+                )
+            }>
                 <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
-                <div class="absolute right-0 text-center border rounded-t-lg size-8 bottom-full">
+                <button
+                    class="absolute right-0 text-center bg-gray-100 border rounded-t-lg size-8 bottom-full"
+                    on:click=move |_| set_ad_open(false)
+                >
                     "X"
-                </div>
+                </button>
             </div>
         </main>
     }
