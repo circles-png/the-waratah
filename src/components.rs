@@ -1,3 +1,4 @@
+use crate::crossword::Vec2;
 use itertools::Itertools;
 use std::iter::once;
 use std::ops::Not;
@@ -5,6 +6,7 @@ use std::ops::Not;
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
+use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
@@ -14,7 +16,7 @@ use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
 use rand::seq::SliceRandom;
-use rand::{random, thread_rng};
+use rand::thread_rng;
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -26,6 +28,7 @@ pub fn App() -> impl IntoView {
                     <Routes base=option_env!("BASE_URL").unwrap_or_default().to_string()>
                         <Route path="/" view=ArticlePreviews/>
                         <Route path="/articles/:id" view=Article/>
+                        <Route path="/crosswords/:id" view=Crossword/>
                         <Route path="/*" view=|| "404"/>
                     </Routes>
                 </PageContainer>
@@ -98,9 +101,9 @@ pub fn ArticlePreviews() -> impl IntoView {
             <div class="flex *:px-2 divide-x font-serif justify-center">
 
                 {move || {
-                    const HOME: &str = "Home";
-                    once(HOME)
-                        .chain(ARTICLES.iter().map(|article| article.topic))
+                    ARTICLES
+                        .iter()
+                        .map(|article| article.topic)
                         .chain(once(ALL))
                         .unique()
                         .map(|topic| {
@@ -109,12 +112,10 @@ pub fn ArticlePreviews() -> impl IntoView {
                                     class=filter
                                         .get()
                                         .as_ref()
-                                        .map_or(topic == HOME, |filter| topic == *filter)
+                                        .map_or(false, |filter| topic == *filter)
                                         .then_some("text-blue-800")
 
-                                    on:click=move |_| set_filter(
-                                        if topic == HOME { None } else { Some(topic) },
-                                    )
+                                    on:click=move |_| set_filter(Some(topic))
                                 >
 
                                     {topic}
@@ -132,7 +133,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                         .chain(ARTICLES.iter().map(|article| article.topic).unique())
                         .chain(once(ALL))
                         .filter(|topic| {
-                            filter.get().as_ref().map_or(true, |filter| topic == filter)
+                            filter.get().as_ref().map_or(*topic != ALL, |filter| topic == filter)
                         })
                         .map(|topic| {
                             view! {
@@ -371,4 +372,93 @@ pub fn Footer() -> impl IntoView {
 #[component]
 pub fn Caption(children: Children) -> impl IntoView {
     view! { <caption class="block w-full py-2 text-sm text-right opacity-50">{children()}</caption> }
+}
+
+#[component]
+#[allow(clippy::needless_lifetimes)]
+pub fn CrosswordGrid<'a>(grid: &'a [Option<(char, Option<usize>)>], size: Vec2) -> impl IntoView {
+    view! {
+        <div class="flex justify-center">
+            <div
+                class="grid text-xs"
+                style=format!("grid-template-columns: repeat({}, minmax(0, 1fr));", size.x)
+            >
+
+                {grid
+                    .iter()
+                    .map(|cell| {
+                        cell.as_ref()
+                            .map_or_else(
+                                || {
+                                    view! {
+                                        <div class="grid h-full bg-black place-content-center"></div>
+                                    }
+                                },
+                                |(letter, word_start)| {
+                                    view! {
+                                        <div class="relative grid h-full p-1 border border-black place-content-center">
+                                            {*letter}
+                                            <div class="absolute text-xs leading-none opacity-50 inset-0.5">
+                                                {*word_start}
+                                            </div>
+                                        </div>
+                                    }
+                                },
+                            )
+                    })
+                    .collect_view()}
+            </div>
+        </div>
+    }
+}
+
+#[component]
+pub fn Crossword() -> impl IntoView {
+    #[derive(Params, PartialEq)]
+    struct CrosswordParams {
+        id: usize,
+    }
+    let crossword =
+        || &CROSSWORDS[use_params::<CrosswordParams>().with(|params| params.as_ref().unwrap().id)];
+    view! {
+        <div>
+            {move || {
+                let crossword = crossword();
+                let letters = crossword.to_letters();
+                let bounds = crossword.bounds();
+                let letters = letters
+                    .iter()
+                    .map(|&(mut letter)| {
+                        letter.position -= bounds.0;
+                        letter
+                    })
+                    .collect_vec();
+                let size = crossword.size();
+                let grid: Vec<Option<(char, Option<usize>)>> = (0..size.y)
+                    .flat_map(|y| {
+                        (0..size.x)
+                            .map(|x| {
+                                letters
+                                    .clone()
+                                    .iter()
+                                    .find(|letter| letter.position == Vec2 { x, y })
+                                    .map(|letter| (
+                                        letter.character,
+                                        crossword
+                                            .words
+                                            .iter()
+                                            .position(|word| {
+                                                word.position - bounds.0 == letter.position
+                                            })
+                                            .map(|index| index + 1),
+                                    ))
+                            })
+                            .collect_vec()
+                    })
+                    .collect();
+                view! { <CrosswordGrid grid=&grid size=size/> }
+            }}
+
+        </div>
+    }
 }
