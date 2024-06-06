@@ -6,9 +6,23 @@ use std::{
 
 fn main() {
     println!("cargo:rerun-if-changed=src/articles");
+    println!("cargo:rerun-if-changed=src/crosswords");
     println!("cargo:rerun-if-changed=src/images/ads");
     collect_articles();
     collect_ads();
+    collect_crosswords();
+}
+
+fn collect_crosswords() {
+    let crosswords: Vec<_> = read_dir("src/crosswords")
+        .unwrap()
+        .map(|entry| read_to_string(entry.unwrap().path()).unwrap().trim().to_string())
+        .collect();
+    let crosswords = crosswords.join("\n\n");
+    File::create(var("OUT_DIR").unwrap() + "/crosswords")
+        .unwrap()
+        .write_all(crosswords.as_bytes())
+        .unwrap();
 }
 
 fn collect_articles() {
