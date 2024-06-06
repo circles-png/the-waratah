@@ -64,29 +64,15 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    let amount = 8;
-    let ads = ADS.choose_multiple(&mut thread_rng(), amount).collect_vec();
-    let half = amount / 2;
+    let ad = ADS.choose(&mut thread_rng()).unwrap();
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
-            <div class="flex-col hidden w-full gap-4 lg:flex">
-                {ads
-                    .iter()
-                    .take(half)
-                    .map(|ad| {
-                        view! { <img src=format!("/images/ads/{}", ad)/> }
-                    })
-                    .collect_view()}
-            </div>
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
-            <div class="flex-col hidden w-full gap-4 lg:flex">
-                {ads
-                    .iter()
-                    .skip(half)
-                    .map(|ad| {
-                        view! { <img src=format!("/images/ads/{}", ad)/> }
-                    })
-                    .collect_view()}
+            <div class="fixed bottom-0 z-10 p-8 bg-gray-100 border rounded-t-lg inset-x-1/4">
+                <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
+                <div class="absolute right-0 text-center border rounded-t-lg size-8 bottom-full">
+                    "X"
+                </div>
             </div>
         </main>
     }
