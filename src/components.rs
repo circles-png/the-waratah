@@ -65,6 +65,7 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     let ad = ADS.choose(&mut thread_rng()).unwrap();
+    let (ad_open, set_ad_open) = create_signal(false);
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
