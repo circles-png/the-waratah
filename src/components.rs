@@ -2,6 +2,7 @@ use crate::crossword::Vec2;
 use itertools::Itertools;
 use std::iter::once;
 use std::ops::Not;
+use std::time::Duration;
 
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
@@ -10,7 +11,7 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, Children, CollectView, IntoView, Params,
+    component, create_signal, set_timeout, view, Children, CollectView, IntoView, Params,
     SignalGet, SignalWith,
 };
 use leptos_router::Params;
@@ -66,14 +67,18 @@ pub fn Header() -> impl IntoView {
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
     let ad = ADS.choose(&mut thread_rng()).unwrap();
-    let (ad_open, set_ad_open) = create_signal(true);
+    let (ad_open, set_ad_open) = create_signal(false);
+    let (animate, set_animate) = create_signal(false);
+    set_timeout(move || set_ad_open(true), Duration::from_millis(500));
+    set_timeout(move || set_animate(true), Duration::from_millis(1500));
     view! {
         <main class="flex justify-center gap-4 p-4 grow">
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
             <div class=move || {
                 format!(
-                    "fixed p-2 bg-gray-100 border rounded-t-lg max-w-3xl transition duration-1000 ease-in bottom-0 {}",
+                    "fixed p-2 bg-gray-100 border rounded-t-lg max-w-3xl bottom-0 {} {}",
                     ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
+                    animate.get().then_some("transition duration-1000 ease-linear").unwrap_or_default(),
                 )
             }>
                 <div class="relative">
