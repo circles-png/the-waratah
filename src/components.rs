@@ -84,7 +84,7 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                 <div class="relative">
                     <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
                     <div class="text-sm text-center opacity-50">"Advertisement"</div>
-                    <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500">
+                    <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500 pointer-events-none">
                         <div class="grid border bg-gray-100/50 size-4 place-content-center">
                             <div class="border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
                                 i
