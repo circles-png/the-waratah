@@ -1,5 +1,6 @@
 use crate::crossword::Vec2;
 use itertools::Itertools;
+use leptos::leptos_dom::helpers::location;
 use std::iter::once;
 use std::ops::Not;
 use std::time::Duration;
@@ -54,12 +55,19 @@ pub fn Header() -> impl IntoView {
                     "Sign Up"
                 </A>
             </div>
-            <A class="w-full text-center" href="/">
+            <a
+                class="w-full text-center"
+                href="/"
+                on:click=|_| {
+                    location().reload().unwrap();
+                }
+            >
+
                 <Heading>
                     <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
                     <div class="block font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
-            </A>
+            </a>
         </header>
     }
 }
@@ -78,7 +86,10 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                 format!(
                     "fixed p-2 bg-gray-100 border rounded-t-lg max-w-3xl bottom-0 {} {}",
                     ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
-                    animate.get().then_some("transition duration-1000 ease-linear").unwrap_or_default(),
+                    animate
+                        .get()
+                        .then_some("transition duration-1000 ease-linear")
+                        .unwrap_or_default(),
                 )
             }>
                 <div class="relative">
