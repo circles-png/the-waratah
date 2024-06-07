@@ -362,7 +362,7 @@ pub fn Footer() -> impl IntoView {
                 <div class="relative">
                     <img
                         src=format!("/images/horizontal-ads/{}", *ad)
-                        class="max-w-3xl cursor-pointer"
+                        class="h-24 cursor-pointer"
                     />
                     <div class=move || {
                         format!(
