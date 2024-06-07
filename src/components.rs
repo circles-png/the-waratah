@@ -3,7 +3,6 @@ use itertools::Itertools;
 use leptos::leptos_dom::helpers::location;
 use std::iter::once;
 use std::ops::Not;
-use std::time::Duration;
 
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
@@ -12,7 +11,7 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, set_timeout, view, Children, CollectView, IntoView, Params,
+    component, create_signal, view, Children, CollectView, IntoView, Params,
     SignalGet, SignalWith,
 };
 use leptos_router::Params;
