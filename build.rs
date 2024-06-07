@@ -58,7 +58,7 @@ fn collect_articles() {
 }
 
 fn collect_ads() {
-    let ads: Vec<_> = read_dir("src/images/ads")
+    let ads: Vec<_> = read_dir("src/images/horizontal-ads")
         .unwrap()
         .map(|entry| entry.unwrap().file_name().to_string_lossy().to_string())
         .collect();
