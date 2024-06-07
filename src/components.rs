@@ -84,7 +84,7 @@ pub fn PageContainer(children: Children) -> impl IntoView {
             <div class="w-full max-w-2xl shrink-0">{children()}</div>
             <div class=move || {
                 format!(
-                    "fixed p-2 bg-gray-100 border rounded-t-lg max-w-3xl bottom-0 {} {}",
+                    "fixed p-2 bg-gray-100 border w-full mx-auto bottom-0 {} {}",
                     ad_open.get().not().then_some("translate-y-[150%]").unwrap_or_default(),
                     animate
                         .get()
@@ -93,7 +93,7 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                 )
             }>
                 <div class="relative">
-                    <img src=format!("/images/ads/{}", *ad) class="cursor-pointer size-full"/>
+                    <img src=format!("/images/ads/{}", *ad) class="cursor-pointer w-96 mx-auto"/>
                     <div class="text-sm text-center opacity-50">"Advertisement"</div>
                     <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500 pointer-events-none">
                         <div class="grid border bg-gray-100/50 size-4 place-content-center">
@@ -378,7 +378,7 @@ pub fn Heading(children: Children) -> impl IntoView {
 #[component]
 pub fn Footer() -> impl IntoView {
     view! {
-        <footer class="flex flex-col p-4 text-white bg-black">
+        <footer class="flex flex-col p-4 pb-36 text-white bg-black">
             <A href="/">
                 <Heading>
                     <div class="capitalize font-blackletter">"The Yesterday"</div>
