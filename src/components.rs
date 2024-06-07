@@ -97,13 +97,13 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                     <div class="text-sm text-center opacity-50">"Advertisement"</div>
                     <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500">
                         <div class="grid border bg-gray-100/50 size-4 place-content-center">
-                            <div class="border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
+                            <div class="cursor-pointer border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
                                 i
                             </div>
                         </div>
                         <button
                             class="grid border place-content-center bg-gray-100/50 size-4"
-                            on:click=move |_| set_ad_open(false)
+                            // on:click=move |_| set_ad_open(false)
                         >
                             "X"
                         </button>
