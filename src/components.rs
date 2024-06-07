@@ -3,6 +3,7 @@ use itertools::Itertools;
 use leptos::leptos_dom::helpers::location;
 use std::iter::once;
 use std::ops::Not;
+use std::time::Duration;
 
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
@@ -11,7 +12,7 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, Children, CollectView, IntoView, Params,
+    component, create_signal, set_timeout, view, Children, CollectView, IntoView, Params,
     SignalGet, SignalWith,
 };
 use leptos_router::Params;
@@ -358,10 +359,10 @@ pub fn Footer() -> impl IntoView {
         </footer>
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
             <div class="relative">
-                <div class="relative min-h-36">
+                <div class="relative">
                     <img
                         src=format!("/images/horizontal-ads/{}", *ad)
-                        class="w-full max-w-2xl cursor-pointer"
+                        class="h-24 cursor-pointer"
                     />
                     <div class=move || {
                         format!(
@@ -379,18 +380,18 @@ pub fn Footer() -> impl IntoView {
                         >
                             "\u{2190}"
                         </button>
-                        <h1 class="text-2xl">
+                        <h1 class="text-sm">
                             "Ads not by " <span class="font-bold">"Google"</span>
                         </h1>
                         <div class="flex flex-col w-full gap-1 px-16">
                             <button
-                                class="w-full py-2 text-white bg-blue-500 rounded-sm shadow"
+                                class="w-full py-1 text-white text-sm bg-blue-500 rounded-sm shadow"
                                 on:click=move |_| set_show_overlay(false)
                             >
                                 "Keep seeing this ad"
                             </button>
                             <button
-                                class="w-full py-2 bg-white rounded-sm shadow"
+                                class="w-full py-1 bg-white text-sm rounded-sm shadow"
                                 on:click=move |_| set_show_overlay(false)
                             >
                                 "Why not this ad? \u{25B7}"
