@@ -93,25 +93,22 @@ pub fn PageContainer(children: Children) -> impl IntoView {
                 )
             }>
                 <div class="relative">
-                    <img src=format!("/images/ads/{}", *ad) class="cursor-pointer w-96 mx-auto"/>
+                    <img src=format!("/images/ads/{}", *ad) class="cursor-pointer h-24 mx-auto"/>
                     <div class="text-sm text-center opacity-50">"Advertisement"</div>
-                    <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500 pointer-events-none">
+                    <div class="absolute top-0 right-0 flex text-xs leading-none text-blue-500">
                         <div class="grid border bg-gray-100/50 size-4 place-content-center">
                             <div class="border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
                                 i
                             </div>
                         </div>
-                        <div class="grid border place-content-center bg-gray-100/50 size-4">
+                        <button
+                            class="grid border place-content-center bg-gray-100/50 size-4"
+                            on:click=move |_| set_ad_open(false)
+                        >
                             "X"
-                        </div>
+                        </button>
                     </div>
                 </div>
-                <button
-                    class="absolute right-0 text-center bg-gray-100 border rounded-t-lg size-8 bottom-full"
-                    on:click=move |_| set_ad_open(false)
-                >
-                    "X"
-                </button>
             </div>
         </main>
     }
