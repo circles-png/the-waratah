@@ -361,10 +361,7 @@ pub fn Footer() -> impl IntoView {
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
             <div class="relative">
                 <div class="relative">
-                    <img
-                        src=format!("/images/horizontal-ads/{}", *ad)
-                        class="h-24 cursor-pointer"
-                    />
+                    <img src=format!("/images/horizontal-ads/{}", *ad) class="h-24 cursor-pointer"/>
                     <div class=move || {
                         format!(
                             "absolute inset-0 z-10 flex flex-col items-center gap-1 p-2 bg-gray-100 border text-neutral-500 {}",
@@ -424,8 +421,8 @@ pub fn Caption(children: Children) -> impl IntoView {
 
 #[component]
 #[allow(clippy::needless_lifetimes, clippy::too_many_lines)]
-pub fn CrosswordGrid<'a>(
-    grid: &'a [Option<(char, Vec<usize>)>],
+pub fn CrosswordGrid(
+    grid: Vec<Option<(char, Vec<usize>)>>,
     crossword: &'static Crossword,
 ) -> impl IntoView {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -498,7 +495,7 @@ pub fn CrosswordGrid<'a>(
     let (last_direction, set_last_direction) = create_signal(None::<Direction>);
     let size = crossword.size();
     {
-        let grid = grid.to_vec();
+        let grid = grid.clone();
         let handler = move |event: KeyboardEvent| {
             let (new, movement) = match event.key().as_str() {
                 key if key.len() == 1 => {
@@ -592,51 +589,54 @@ pub fn CrosswordGrid<'a>(
                 style=format!("grid-template-columns: repeat({}, minmax(0, 1fr));", size.x)
             >
                 {grid
-                    .iter()
+                    .into_iter()
                     .enumerate()
                     .map(|(index, cell)| {
-                        cell.as_ref()
-                            .map_or_else(
-                                || {
-                                    view! {
-                                        <div class="bg-black">
-                                            <button
-                                                class="size-full"
-                                                on:click=move |_| set_selected(None)
-                                            ></button>
-                                        </div>
-                                    }
-                                },
-                                |(_, word_start)| {
-                                    view! {
-                                        <div class=move || {
-                                            format!(
-                                                "relative text-xl border border-black size-8 {}",
-                                                (selected.get() == Some(index))
-                                                    .then_some("bg-yellow-200")
-                                                    .unwrap_or_default(),
-                                            )
-                                        }>
-                                            <button
-                                                class="size-full"
-                                                on:click=move |_| match selected.get() {
-                                                    Some(selected) if selected == index => set_selected(None),
-                                                    _ => set_selected(Some(index)),
-                                                }
-                                            >
+                        cell.map_or_else(
+                            || {
+                                view! {
+                                    <div class="bg-black">
+                                        <button
+                                            class="size-full"
+                                            on:click=move |_| set_selected(None)
+                                        ></button>
+                                    </div>
+                                }
+                            },
+                            |(letter, word_start)| {
+                                view! {
+                                    <div class=move || {
+                                        format!(
+                                            "relative text-xl border border-black size-8 {} {}",
+                                            (selected.get() == Some(index))
+                                                .then_some("bg-yellow-200")
+                                                .unwrap_or_default(),
+                                            (letter
+                                                == solution.get().get(&index).unwrap().unwrap_or_default())
+                                                .then_some("outline outline-green-500")
+                                                .unwrap_or_default(),
+                                        )
+                                    }>
+                                        <button
+                                            class="size-full"
+                                            on:click=move |_| match selected.get() {
+                                                Some(selected) if selected == index => set_selected(None),
+                                                _ => set_selected(Some(index)),
+                                            }
+                                        >
 
-                                                {move || {
-                                                    solution.get().get(&index).unwrap().unwrap_or_default()
-                                                }}
+                                            {move || {
+                                                solution.get().get(&index).unwrap().unwrap_or_default()
+                                            }}
 
-                                            </button>
-                                            <div class="absolute text-xs leading-none opacity-50 inset-0.5 pointer-events-none">
-                                                {word_start.iter().map(|index| index + 1).join(", ")}
-                                            </div>
+                                        </button>
+                                        <div class="absolute text-xs leading-none opacity-50 inset-0.5 pointer-events-none">
+                                            {word_start.iter().map(|index| index + 1).join(", ")}
                                         </div>
-                                    }
-                                },
-                            )
+                                    </div>
+                                }
+                            },
+                        )
                     })
                     .collect_view()}
             </div>
@@ -679,7 +679,7 @@ pub fn Crossword() -> impl IntoView {
     };
     view! {
         <div class="flex flex-col gap-2">
-            {move || view! { <CrosswordGrid grid=&grid() crossword=crossword()/> }}
+            {move || view! { <CrosswordGrid grid=grid() crossword=crossword()/> }}
             <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
                 {move || {
                     Direction::ALL
