@@ -624,7 +624,7 @@ pub fn CrosswordGrid(
                                                 _ => set_selected(Some(index)),
                                             }
                                         >
-                                            {letter}
+
                                             {move || {
                                                 solution.get().get(&index).unwrap().unwrap_or_default()
                                             }}
