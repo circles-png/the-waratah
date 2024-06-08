@@ -422,7 +422,7 @@ pub fn Caption(children: Children) -> impl IntoView {
 #[component]
 #[allow(clippy::needless_lifetimes, clippy::too_many_lines)]
 pub fn CrosswordGrid(
-    grid: Vec<Option<(char, Vec<usize>)>>,
+    grid: Vec<Option<(char, Option<usize>)>>,
     crossword: &'static Crossword,
 ) -> impl IntoView {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -631,7 +631,7 @@ pub fn CrosswordGrid(
 
                                         </button>
                                         <div class="absolute text-xs leading-none opacity-50 inset-0.5 pointer-events-none">
-                                            {word_start.iter().map(|index| index + 1).join(", ")}
+                                            {word_start.map(|index| index + 1)}
                                         </div>
                                     </div>
                                 }
@@ -652,30 +652,36 @@ pub fn Crossword() -> impl IntoView {
     }
     let crossword =
         || &CROSSWORDS[use_params::<CrosswordParams>().with(|params| params.as_ref().unwrap().id)];
-    let grid = move || {
-        let size = crossword().size();
-        (0..size.y)
-            .flat_map(|y| {
-                (0..size.x)
-                    .map(|x| {
-                        crossword()
-                            .to_letters()
-                            .iter()
-                            .find(|letter| letter.position == Vec2 { x, y })
-                            .map(|letter| {
-                                (
-                                    letter.character,
-                                    crossword()
-                                        .words
-                                        .iter()
-                                        .positions(|word| word.position == letter.position)
-                                        .collect_vec(),
-                                )
-                            })
-                    })
-                    .collect_vec()
-            })
-            .collect_vec()
+    let starts = crossword()
+        .words
+        .iter()
+        .map(|word| word.position)
+        .unique()
+        .sorted_unstable_by(|a, b| a.y.cmp(&b.y).then_with(|| a.x.cmp(&b.x)))
+        .collect_vec();
+    let grid = {
+        let starts = starts.clone();
+        move || {
+            let size = crossword().size();
+            (0..size.y)
+                .flat_map(|y| {
+                    (0..size.x)
+                        .map(|x| {
+                            crossword()
+                                .to_letters()
+                                .iter()
+                                .find(|letter| letter.position == Vec2 { x, y })
+                                .map(|letter| {
+                                    (
+                                        letter.character,
+                                        starts.iter().position(|start| *start == Vec2 { x, y }),
+                                    )
+                                })
+                        })
+                        .collect_vec()
+                })
+                .collect_vec()
+        }
     };
     view! {
         <div class="flex flex-col gap-2">
@@ -692,12 +698,16 @@ pub fn Crossword() -> impl IntoView {
                                         {crossword()
                                             .words
                                             .iter()
-                                            .enumerate()
-                                            .filter(|(_, word)| word.direction == *direction)
-                                            .map(|(index, word)| {
+                                            .filter(|word| word.direction == *direction)
+                                            .map(|word| {
                                                 view! {
-                                                    <div class="font-semibold">{index + 1}</div>
-                                                    <div class="">{word.clue}</div>
+                                                    <div class="font-semibold">
+                                                        {starts
+                                                            .iter()
+                                                            .position(|start| *start == word.position)
+                                                            .map(|index| index + 1)}
+                                                    </div>
+                                                    <div>{word.clue}</div>
                                                 }
                                             })
                                             .collect_view()}

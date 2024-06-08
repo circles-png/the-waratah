@@ -22,12 +22,12 @@ impl Word {
     pub const fn contains(&self, position: Vec2) -> bool {
         let end = match self.direction {
             Direction::Across => Vec2 {
-                x: self.position.x + self.answer.len()-1,
+                x: self.position.x + self.answer.len() - 1,
                 y: self.position.y,
             },
             Direction::Down => Vec2 {
                 x: self.position.x,
-                y: self.position.y + self.answer.len()-1,
+                y: self.position.y + self.answer.len() - 1,
             },
         };
         self.position.x <= position.x
@@ -163,10 +163,7 @@ impl SubAssign for Vec2 {
 lazy_static! {
     pub static ref CROSSWORDS: &'static [Crossword] = {
         let data = include_str!(concat!(env!("OUT_DIR"), "/crosswords"));
-        let crosswords: Vec<_> = data
-            .split("\n\n")
-            .map(|crossword| Crossword::from_str(crossword))
-            .collect();
+        let crosswords: Vec<_> = data.split("\n\n").map(Crossword::from_str).collect();
         crosswords.leak()
     };
 }
