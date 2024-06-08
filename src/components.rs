@@ -1,8 +1,10 @@
-use crate::crossword::Vec2;
+use crate::crossword::{Crossword, Direction, Vec2};
 use itertools::Itertools;
+use leptos::ev::{keydown, KeyboardEvent};
 use leptos::leptos_dom::helpers::location;
+use std::collections::HashMap;
 use std::iter::once;
-use std::ops::Not;
+use std::ops::{Index, Neg, Not};
 
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
@@ -11,7 +13,7 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, Children, CollectView, IntoView, Params,
+    component, create_signal, view, window_event_listener, Children, CollectView, IntoView, Params,
     SignalGet, SignalWith,
 };
 use leptos_router::Params;
@@ -421,31 +423,215 @@ pub fn Caption(children: Children) -> impl IntoView {
 }
 
 #[component]
-#[allow(clippy::needless_lifetimes)]
-pub fn CrosswordGrid<'a>(grid: &'a [Option<(char, Option<usize>)>], size: Vec2) -> impl IntoView {
+#[allow(clippy::needless_lifetimes, clippy::too_many_lines)]
+pub fn CrosswordGrid<'a>(
+    grid: &'a [Option<(char, Vec<usize>)>],
+    crossword: &'static Crossword,
+) -> impl IntoView {
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    enum Move {
+        Left,
+        Right,
+        Up,
+        Down,
+        Next,
+        Previous,
+    }
+    impl Move {
+        const fn direction(self) -> Option<Direction> {
+            match self {
+                Self::Left | Self::Right => Some(Direction::Across),
+                Self::Up | Self::Down => Some(Direction::Down),
+                Self::Next | Self::Previous => None,
+            }
+        }
+        const fn new_index(self, crossword_size: Vec2, selected: usize) -> Option<usize> {
+            match self {
+                Self::Left => Some(selected - 1),
+                Self::Right => Some(selected + 1),
+                Self::Up => Some(selected - (crossword_size.x)),
+                Self::Down => Some(selected + crossword_size.x),
+                Self::Next | Self::Previous => None,
+            }
+        }
+        const fn out_of_bounds(self, crossword_size: Vec2, selected: usize) -> Option<bool> {
+            match self {
+                Self::Left => Some(selected % crossword_size.x == 0),
+                Self::Right => Some(selected % crossword_size.x == crossword_size.x - 1),
+                Self::Up => Some(selected < crossword_size.x),
+                Self::Down => Some(selected >= crossword_size.x * (crossword_size.y - 1)),
+                Self::Next | Self::Previous => None,
+            }
+        }
+        const fn from_direction(direction: Direction) -> Self {
+            match direction {
+                Direction::Across => Self::Right,
+                Direction::Down => Self::Down,
+            }
+        }
+    }
+    impl Neg for Move {
+        type Output = Self;
+        fn neg(self) -> Self::Output {
+            match self {
+                Self::Left => Self::Right,
+                Self::Right => Self::Left,
+                Self::Up => Self::Down,
+                Self::Down => Self::Up,
+                Self::Next => Self::Previous,
+                Self::Previous => Self::Next,
+            }
+        }
+    }
+    enum SetSolution {
+        Clear,
+        Write(char),
+        Keep,
+    }
+    let (selected, set_selected) = create_signal(None::<usize>);
+    let (solution, set_solution) = create_signal(
+        grid.iter()
+            .enumerate()
+            .filter_map(|(index, cell)| cell.as_ref().map(|_| (index, None::<char>)))
+            .collect::<HashMap<_, _>>(),
+    );
+    let (last_direction, set_last_direction) = create_signal(None::<Direction>);
+    let size = crossword.size();
+    {
+        let grid = grid.to_vec();
+        let handler = move |event: KeyboardEvent| {
+            let (new, movement) = match event.key().as_str() {
+                key if key.len() == 1 => {
+                    (SetSolution::Write(key.chars().next().unwrap()), Move::Next)
+                }
+                "ArrowLeft" => (SetSolution::Keep, Move::Left),
+                "ArrowRight" => (SetSolution::Keep, Move::Right),
+                "ArrowUp" => (SetSolution::Keep, Move::Up),
+                "ArrowDown" => (SetSolution::Keep, Move::Down),
+                "Backspace" => (SetSolution::Clear, Move::Previous),
+                "Escape" => {
+                    set_selected(None);
+                    return;
+                }
+                _ => return,
+            };
+
+            let Some(selected) = selected.get() else {
+                return;
+            };
+            'out: {
+                let apply_move = |movement: Move| {
+                    if movement.out_of_bounds(size, selected).unwrap() {
+                        return None;
+                    }
+                    set_last_direction(movement.direction());
+                    Some(movement.new_index(size, selected).unwrap())
+                };
+                let new_selected = match movement {
+                    Move::Next | Move::Previous => {
+                        let position = Vec2 {
+                            x: selected % size.x,
+                            y: selected / size.x,
+                        };
+                        let Some(word) = crossword
+                            .words
+                            .iter()
+                            .find(|word| {
+                                word.contains(position)
+                                    && last_direction.with(|direction| {
+                                        direction
+                                            .map(|direction| word.direction == direction)
+                                            .unwrap_or(true)
+                                    })
+                            })
+                            .or_else(|| {
+                                crossword.words.iter().find(|word| word.contains(position))
+                            })
+                        else {
+                            break 'out;
+                        };
+                        match apply_move(match movement {
+                            Move::Next => Move::from_direction(word.direction),
+                            Move::Previous => -Move::from_direction(word.direction),
+                            _ => unreachable!(),
+                        }) {
+                            None => break 'out,
+                            Some(new_selected) => new_selected,
+                        }
+                    }
+                    movement => match apply_move(movement) {
+                        None => break 'out,
+                        Some(new_selected) => new_selected,
+                    },
+                };
+                if Option::is_none(grid.index(new_selected)) {
+                    break 'out;
+                };
+                set_selected(Some(new_selected));
+            }
+            match new {
+                SetSolution::Keep => {}
+                new @ (SetSolution::Clear | SetSolution::Write(_)) => {
+                    let mut solution = solution.get();
+                    let char = solution.get_mut(&selected).unwrap();
+                    *char = match new {
+                        SetSolution::Clear => None,
+                        SetSolution::Write(char) => Some(char),
+                        SetSolution::Keep => unreachable!(),
+                    };
+                    set_solution(solution);
+                }
+            }
+        };
+        window_event_listener(keydown, handler);
+    }
     view! {
         <div class="flex justify-center">
             <div
-                class="grid text-xs"
+                class="grid"
                 style=format!("grid-template-columns: repeat({}, minmax(0, 1fr));", size.x)
             >
-
                 {grid
                     .iter()
-                    .map(|cell| {
+                    .enumerate()
+                    .map(|(index, cell)| {
                         cell.as_ref()
                             .map_or_else(
                                 || {
                                     view! {
-                                        <div class="grid h-full bg-black place-content-center"></div>
+                                        <div class="bg-black">
+                                            <button
+                                                class="size-full"
+                                                on:click=move |_| set_selected(None)
+                                            ></button>
+                                        </div>
                                     }
                                 },
                                 |(letter, word_start)| {
                                     view! {
-                                        <div class="relative grid h-full p-1 border border-black place-content-center">
-                                            {*letter}
-                                            <div class="absolute text-xs leading-none opacity-50 inset-0.5">
-                                                {*word_start}
+                                        <div class=move || {
+                                            format!(
+                                                "relative text-xl border border-black size-8 {}",
+                                                (selected.get() == Some(index))
+                                                    .then_some("bg-yellow-200")
+                                                    .unwrap_or_default(),
+                                            )
+                                        }>
+                                            <button
+                                                class="size-full"
+                                                on:click=move |_| match selected.get() {
+                                                    Some(selected) if selected == index => set_selected(None),
+                                                    _ => set_selected(Some(index)),
+                                                }
+                                            >
+
+                                                {move || {
+                                                    solution.get().get(&index).unwrap().unwrap_or_default()
+                                                }}
+
+                                            </button>
+                                            <div class="absolute text-xs leading-none opacity-50 inset-0.5 pointer-events-none">
+                                                {word_start.iter().map(|index| index + 1).join(", ")}
                                             </div>
                                         </div>
                                     }
@@ -466,45 +652,63 @@ pub fn Crossword() -> impl IntoView {
     }
     let crossword =
         || &CROSSWORDS[use_params::<CrosswordParams>().with(|params| params.as_ref().unwrap().id)];
-    view! {
-        <div>
-            {move || {
-                let crossword = crossword();
-                let letters = crossword.to_letters();
-                let bounds = crossword.bounds();
-                let letters = letters
-                    .iter()
-                    .map(|&(mut letter)| {
-                        letter.position -= bounds.0;
-                        letter
+    let grid = move || {
+        let size = crossword().size();
+        (0..size.y)
+            .flat_map(|y| {
+                (0..size.x)
+                    .map(|x| {
+                        crossword()
+                            .to_letters()
+                            .iter()
+                            .find(|letter| letter.position == Vec2 { x, y })
+                            .map(|letter| {
+                                (
+                                    letter.character,
+                                    crossword()
+                                        .words
+                                        .iter()
+                                        .positions(|word| word.position == letter.position)
+                                        .collect_vec(),
+                                )
+                            })
                     })
-                    .collect_vec();
-                let size = crossword.size();
-                let grid: Vec<Option<(char, Option<usize>)>> = (0..size.y)
-                    .flat_map(|y| {
-                        (0..size.x)
-                            .map(|x| {
-                                letters
-                                    .clone()
-                                    .iter()
-                                    .find(|letter| letter.position == Vec2 { x, y })
-                                    .map(|letter| (
-                                        letter.character,
-                                        crossword
+                    .collect_vec()
+            })
+            .collect_vec()
+    };
+    view! {
+        <div class="flex flex-col gap-2">
+            {move || view! { <CrosswordGrid grid=&grid() crossword=crossword()/> }}
+            <div class="grid grid-cols-2">
+                {move || {
+                    Direction::ALL
+                        .iter()
+                        .map(|direction| {
+                            view! {
+                                <div class="flex flex-col">
+                                    <h1 class="text-2xl font-semibold">{direction.to_string()}</h1>
+                                    <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2">
+                                        {crossword()
                                             .words
                                             .iter()
-                                            .position(|word| {
-                                                word.position - bounds.0 == letter.position
+                                            .enumerate()
+                                            .filter(|(_, word)| word.direction == *direction)
+                                            .map(|(index, word)| {
+                                                view! {
+                                                    <div class="font-semibold">{index + 1}</div>
+                                                    <div class="">{word.clue}</div>
+                                                }
                                             })
-                                            .map(|index| index + 1),
-                                    ))
-                            })
-                            .collect_vec()
-                    })
-                    .collect();
-                view! { <CrosswordGrid grid=&grid size=size/> }
-            }}
+                                            .collect_view()}
+                                    </div>
+                                </div>
+                            }
+                        })
+                        .collect_view()
+                }}
 
+            </div>
         </div>
     }
 }
