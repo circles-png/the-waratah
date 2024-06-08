@@ -132,35 +132,24 @@ pub fn ArticlePreviews() -> impl IntoView {
                             view! {
                                 <Heading>{topic}</Heading>
                                 <Divider/>
-                                <div class="flex flex-col gap-8 sm:grid sm:grid-cols-2">
-
-                                    {move || match topic {
-                                        LATEST => {
-                                            ARTICLES
-                                                .iter()
-                                                .take(6)
-                                                .map(|article| {
-                                                    view! { <ArticlePreview article=article.clone()/> }
-                                                })
-                                                .collect_view()
+                                <div class="flex flex-col grid-cols-2 gap-8 sm:grid">
+                                    {move || {
+                                        match topic {
+                                            LATEST => ARTICLES.iter().take(6).cloned().collect_vec(),
+                                            ALL => ARTICLES.iter().cloned().collect_vec(),
+                                            _ => {
+                                                ARTICLES
+                                                    .iter()
+                                                    .filter(|article| article.topic == topic)
+                                                    .cloned()
+                                                    .collect_vec()
+                                            }
                                         }
-                                        ALL => {
-                                            ARTICLES
-                                                .iter()
-                                                .map(|article| {
-                                                    view! { <ArticlePreview article=article.clone()/> }
-                                                })
-                                                .collect_view()
-                                        }
-                                        topic => {
-                                            ARTICLES
-                                                .iter()
-                                                .filter(|article| { article.topic == topic })
-                                                .map(|article| {
-                                                    view! { <ArticlePreview article=article.clone()/> }
-                                                })
-                                                .collect_view()
-                                        }
+                                            .iter()
+                                            .map(|article| {
+                                                view! { <ArticlePreview article=article.clone()/> }
+                                            })
+                                            .collect_view()
                                     }}
 
                                 </div>
@@ -190,7 +179,11 @@ pub fn ArticlePreview(
 
             href=format!("/articles/{}", article.id)
         >
-            <img src=article.image.url alt=article.title/>
+            <img
+                src=article.image.url
+                alt=article.image.caption
+                class="object-cover w-full aspect-[3/2]"
+            />
             <div>
                 <small class="text-sm font-light text-blue-800">
                     {article.topic.to_uppercase()}
@@ -241,8 +234,8 @@ pub fn Article() -> impl IntoView {
             <div class="sm:px-16">
                 <img
                     src=move || article().image.url
-                    alt=move || article().title
-                    class="object-cover w-full"
+                    alt=move || article().image.caption
+                    class="object-cover w-full aspect-[3/2]"
                 />
                 <Caption>{move || article().image.caption}</Caption>
             </div>
@@ -264,7 +257,7 @@ pub fn Article() -> impl IntoView {
                                 Fragment::Image(Image { url, caption }) => {
                                     view! {
                                         <div class="px-16">
-                                            <img src=*url class="object-cover w-full"/>
+                                            <img src=*url alt=*caption class="object-cover w-full"/>
                                             <Caption>{*caption}</Caption>
                                         </div>
                                     }
