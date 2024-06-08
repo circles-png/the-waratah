@@ -62,7 +62,7 @@ impl Crossword {
                 .map(|line| {
                     let mut parts = line.splitn(5, |char: char| char.is_whitespace());
                     Word {
-                        answer: parts.next().unwrap(),
+                        answer: parts.next().unwrap().to_ascii_uppercase().leak(),
                         position: Vec2 {
                             x: usize::from_str(parts.next().unwrap()).unwrap(),
                             y: usize::from_str(parts.next().unwrap()).unwrap(),

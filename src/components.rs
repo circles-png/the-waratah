@@ -1,10 +1,13 @@
 use crate::crossword::{Crossword, Direction, Vec2};
 use itertools::Itertools;
-use leptos::ev::{keydown, KeyboardEvent};
+use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
+use leptos::logging::{debug_warn, log};
+use leptos::web_sys::HtmlButtonElement;
 use std::collections::HashMap;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
+use std::str::FromStr;
 
 use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
@@ -13,12 +16,12 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_signal, view, window_event_listener, Children, CollectView, IntoView, Params,
-    SignalGet, SignalWith,
+    component, create_memo, create_signal, event_target, view, window_event_listener, Callback,
+    Children, CollectView, IntoView, Params, SignalGet, SignalWith,
 };
-use leptos_router::Params;
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
+use leptos_router::{use_params_map, Params};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
@@ -424,6 +427,7 @@ pub fn Caption(children: Children) -> impl IntoView {
 pub fn CrosswordGrid(
     grid: Vec<Option<(char, Option<usize>)>>,
     crossword: &'static Crossword,
+    #[prop(into)] on_solution_change: Callback<HashMap<usize, Option<char>>>,
 ) -> impl IntoView {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     enum Move {
@@ -498,9 +502,10 @@ pub fn CrosswordGrid(
         let grid = grid.clone();
         let handler = move |event: KeyboardEvent| {
             let (new, movement) = match event.key().as_str() {
-                key if key.len() == 1 => {
-                    (SetSolution::Write(key.chars().next().unwrap()), Move::Next)
-                }
+                key if key.len() == 1 && key.chars().next().unwrap().is_ascii_alphabetic() => (
+                    SetSolution::Write(key.chars().next().unwrap().to_ascii_uppercase()),
+                    Move::Next,
+                ),
                 "ArrowLeft" => (SetSolution::Keep, Move::Left),
                 "ArrowRight" => (SetSolution::Keep, Move::Right),
                 "ArrowUp" => (SetSolution::Keep, Move::Up),
@@ -576,6 +581,7 @@ pub fn CrosswordGrid(
                         SetSolution::Write(char) => Some(char),
                         SetSolution::Keep => unreachable!(),
                     };
+                    on_solution_change(solution.clone());
                     set_solution(solution);
                 }
             }
@@ -603,17 +609,13 @@ pub fn CrosswordGrid(
                                     </div>
                                 }
                             },
-                            |(letter, word_start)| {
+                            |(_, word_start)| {
                                 view! {
                                     <div class=move || {
                                         format!(
-                                            "relative text-xl border border-black size-8 {} {}",
+                                            "relative text-xl border border-black size-8 {}",
                                             (selected.get() == Some(index))
                                                 .then_some("bg-yellow-200")
-                                                .unwrap_or_default(),
-                                            (letter
-                                                == solution.get().get(&index).unwrap().unwrap_or_default())
-                                                .then_some("outline outline-green-500")
                                                 .unwrap_or_default(),
                                         )
                                     }>
@@ -645,22 +647,22 @@ pub fn CrosswordGrid(
 }
 
 #[component]
+#[allow(clippy::too_many_lines)]
 pub fn Crossword() -> impl IntoView {
-    #[derive(Params, PartialEq)]
-    struct CrosswordParams {
-        id: usize,
-    }
-    let crossword =
-        || &CROSSWORDS[use_params::<CrosswordParams>().with(|params| params.as_ref().unwrap().id)];
-    let starts = crossword()
-        .words
-        .iter()
-        .map(|word| word.position)
-        .unique()
-        .sorted_unstable_by(|a, b| a.y.cmp(&b.y).then_with(|| a.x.cmp(&b.x)))
-        .collect_vec();
+    let crossword = || -> &Crossword {
+        &CROSSWORDS[use_params_map()
+            .with(|params| <usize as FromStr>::from_str(params.get("id").unwrap()).unwrap())]
+    };
+    let starts = move || {
+        crossword()
+            .words
+            .iter()
+            .map(|word| word.position)
+            .unique()
+            .sorted_unstable_by(|a, b| a.y.cmp(&b.y).then_with(|| a.x.cmp(&b.x)))
+            .collect_vec()
+    };
     let grid = {
-        let starts = starts.clone();
         move || {
             let size = crossword().size();
             (0..size.y)
@@ -674,7 +676,7 @@ pub fn Crossword() -> impl IntoView {
                                 .map(|letter| {
                                     (
                                         letter.character,
-                                        starts.iter().position(|start| *start == Vec2 { x, y }),
+                                        starts().iter().position(|start| *start == Vec2 { x, y }),
                                     )
                                 })
                         })
@@ -683,9 +685,47 @@ pub fn Crossword() -> impl IntoView {
                 .collect_vec()
         }
     };
+    let (solution, set_solution) = create_signal::<HashMap<usize, Option<char>>>(HashMap::new());
+    let correct = create_memo(move |_| {
+        !solution.get().is_empty()
+            && solution
+                .get()
+                .iter()
+                .all(|(index, letter)| match grid().get(*index).unwrap() {
+                    None => true,
+                    Some((char, _)) => letter == &Some(*char),
+                })
+    });
+    let check = move |event: MouseEvent| {
+        let button: HtmlButtonElement = event_target(&event);
+        button.set_text_content(Some(format!("{:?}", correct()).as_str()));
+    };
     view! {
         <div class="flex flex-col gap-2">
-            {move || view! { <CrosswordGrid grid=grid() crossword=crossword()/> }}
+
+            {move || {
+                view! {
+                    <CrosswordGrid
+                        grid=grid()
+                        crossword=crossword()
+                        on_solution_change=set_solution
+                    />
+                }
+            }}
+            <div class="flex justify-center">
+                <button
+                    class="px-4 py-2 text-white bg-black rounded disabled:opacity-50 disabled:pointer-events-none"
+                    disabled=move || {
+                        solution().is_empty()
+                            || solution().iter().any(|(_, letter)| letter.is_none())
+                    }
+
+                    on:click=check
+                >
+
+                    "Check"
+                </button>
+            </div>
             <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
                 {move || {
                     Direction::ALL
@@ -699,10 +739,13 @@ pub fn Crossword() -> impl IntoView {
                                             .words
                                             .iter()
                                             .filter(|word| word.direction == *direction)
+                                            .sorted_unstable_by_key(|word| {
+                                                starts().iter().position(|start| *start == word.position)
+                                            })
                                             .map(|word| {
                                                 view! {
                                                     <div class="font-semibold">
-                                                        {starts
+                                                        {starts()
                                                             .iter()
                                                             .position(|start| *start == word.position)
                                                             .map(|index| index + 1)}
