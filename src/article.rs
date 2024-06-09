@@ -119,7 +119,7 @@ lazy_static! {
                 .or_else(|| rest.get(length..))
                 .unwrap();
         }
-        articles.sort_unstable_by_key(|article| article.index);
+        articles.sort_unstable_by_key(|article| -(article.index as i128));
         Ok(articles.leak())
     })()
     .unwrap();

@@ -312,7 +312,7 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
                     };
                     selected
                         .into_iter()
-                        .take(5)
+                        .take(3)
                         .map(|article| {
                             view! {
                                 <ArticlePreview
