@@ -5,6 +5,7 @@ use lazy_static::lazy_static;
 pub struct Article {
     pub id: &'static str,
     pub topic: &'static str,
+    pub index: usize,
     pub blurb: &'static str,
     pub title: &'static str,
     pub image: Image,
@@ -43,9 +44,11 @@ impl Article {
         let topic_len: usize = topic_len.parse()?;
         let topic = &rest[..topic_len];
         let rest = &rest[topic_len + 1..];
-        let (id, title) = rest
+        let (id, index) = rest
             .split_once(' ')
             .ok_or_else(|| anyhow!("invalid data"))?;
+        let index = index.parse().unwrap();
+        let title = lines.next().ok_or_else(|| anyhow!("no title"))?;
         let blurb = lines.next().ok_or_else(|| anyhow!("no blurb"))?;
         let image = Image {
             url: lines.next().ok_or_else(|| anyhow!("no image"))?,
@@ -75,6 +78,7 @@ impl Article {
         Ok(Self {
             id,
             topic,
+            index,
             blurb,
             title,
             image,
@@ -115,6 +119,7 @@ lazy_static! {
                 .or_else(|| rest.get(length..))
                 .unwrap();
         }
+        articles.sort_unstable_by_key(|article| article.index);
         Ok(articles.leak())
     })()
     .unwrap();
