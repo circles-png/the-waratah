@@ -2,7 +2,6 @@ use crate::crossword::{Crossword, Direction, Vec2};
 use itertools::Itertools;
 use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
-use leptos::logging::{debug_warn, log};
 use leptos::web_sys::HtmlButtonElement;
 use std::collections::HashMap;
 use std::iter::once;
