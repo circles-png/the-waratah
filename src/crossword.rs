@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::io::Read;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 use std::str::FromStr;
 
@@ -162,7 +163,15 @@ impl SubAssign for Vec2 {
 
 lazy_static! {
     pub static ref CROSSWORDS: &'static [Crossword] = {
-        let data = include_str!(concat!(env!("OUT_DIR"), "/crosswords"));
+        let data = String::from_utf8(
+            include_bytes!(concat!(env!("OUT_DIR"), "/crosswords"))
+                .bytes()
+                .map(Result::unwrap)
+                .map(u8::reverse_bits)
+                .collect(),
+        )
+        .unwrap()
+        .leak();
         let crosswords: Vec<_> = data.split("\n\n").map(Crossword::from_str).collect();
         crosswords.leak()
     };

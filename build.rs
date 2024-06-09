@@ -16,12 +16,22 @@ fn main() {
 fn collect_crosswords() {
     let crosswords: Vec<_> = read_dir("src/crosswords")
         .unwrap()
-        .map(|entry| read_to_string(entry.unwrap().path()).unwrap().trim().to_string())
+        .map(|entry| {
+            read_to_string(entry.unwrap().path())
+                .unwrap()
+                .trim()
+                .to_string()
+        })
         .collect();
-    let crosswords = crosswords.join("\n\n");
+    let crosswords: Vec<_> = crosswords
+        .join("\n\n")
+        .bytes()
+        .map(u8::reverse_bits)
+        .collect();
+
     File::create(var("OUT_DIR").unwrap() + "/crosswords")
         .unwrap()
-        .write_all(crosswords.as_bytes())
+        .write_all(&crosswords)
         .unwrap();
 }
 
