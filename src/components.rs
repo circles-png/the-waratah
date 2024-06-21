@@ -612,7 +612,7 @@ pub fn CrosswordGrid(
                                         )
                                     }>
                                         <button
-                                            class="size-full"
+                                            class="size-full focus:outline-none"
                                             on:click=move |_| match selected.get() {
                                                 Some(selected) if selected == index => set_selected(None),
                                                 _ => set_selected(Some(index)),
