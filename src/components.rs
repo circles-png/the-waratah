@@ -496,6 +496,7 @@ pub fn CrosswordGrid(
     {
         let grid = grid.clone();
         let handler = move |event: KeyboardEvent| {
+            event.prevent_default();
             let (new, movement) = match event.key().as_str() {
                 key if key.len() == 1 && key.chars().next().unwrap().is_ascii_alphabetic() => (
                     SetSolution::Write(key.chars().next().unwrap().to_ascii_uppercase()),
@@ -627,7 +628,7 @@ pub fn CrosswordGrid(
                                             }}
 
                                         </button>
-                                        <div class="absolute text-xs leading-none opacity-50 inset-0.5 pointer-events-none">
+                                        <div class="absolute text-[8px] leading-none opacity-50 inset-0.5 pointer-events-none">
                                             {word_start.map(|index| index + 1)}
                                         </div>
                                     </div>
