@@ -223,6 +223,9 @@ pub fn Article() -> impl IntoView {
         <div class="flex flex-col gap-4">
             <div>
                 <Heading>{move || article().title.to_uppercase()}</Heading>
+                <Caption>
+                    <div class="text-sm text-left">{move || article().blurb}</div>
+                </Caption>
                 <div class="flex gap-1 text-sm font-light">
                     <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
                     "\u{b7} "
