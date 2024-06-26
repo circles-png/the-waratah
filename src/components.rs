@@ -172,7 +172,7 @@ pub fn ArticlePreview(
     view! {
         <A
             class=format!(
-                "flex gap-2 {}",
+                "flex gap-3 {}",
                 horizontal.not().then_some("flex-col").unwrap_or_default(),
             )
 
@@ -224,7 +224,7 @@ pub fn Article() -> impl IntoView {
             <div>
                 <Heading>{move || article().title.to_uppercase()}</Heading>
                 <Caption>
-                    <div class="text-sm text-left">{move || article().blurb}</div>
+                    <div class="sm:text-lg text-left">{move || article().blurb}</div>
                 </Caption>
                 <div class="flex gap-1 text-sm font-light">
                     <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
@@ -296,9 +296,9 @@ pub fn Divider(#[prop(optional)] light: bool) -> impl IntoView {
 #[component]
 pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl IntoView {
     view! {
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-4">
             <Heading>"Read More"</Heading>
-            <div class="flex flex-col w-full gap-2 [&_img]:w-1/4">
+            <div class="flex flex-col w-full gap-4 [&_img]:w-1/4">
                 {move || {
                     let mut articles = ARTICLES.to_vec();
                     articles.shuffle(&mut thread_rng());
