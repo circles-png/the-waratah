@@ -224,7 +224,7 @@ pub fn Article() -> impl IntoView {
             <div>
                 <Heading>{move || article().title.to_uppercase()}</Heading>
                 <Caption>
-                    <div class="sm:text-lg text-left">{move || article().blurb}</div>
+                    <div class="text-left sm:text-lg">{move || article().blurb}</div>
                 </Caption>
                 <div class="flex gap-1 text-sm font-light">
                     <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
@@ -496,7 +496,6 @@ pub fn CrosswordGrid(
     {
         let grid = grid.clone();
         let handler = move |event: KeyboardEvent| {
-            event.prevent_default();
             let (new, movement) = match event.key().as_str() {
                 key if key.len() == 1 && key.chars().next().unwrap().is_ascii_alphabetic() => (
                     SetSolution::Write(key.chars().next().unwrap().to_ascii_uppercase()),
@@ -509,11 +508,12 @@ pub fn CrosswordGrid(
                 "Backspace" => (SetSolution::Clear, Move::Previous),
                 "Escape" => {
                     set_selected(None);
+                    event.prevent_default();
                     return;
                 }
                 _ => return,
             };
-
+            event.prevent_default();
             let Some(selected) = selected.get() else {
                 return;
             };
