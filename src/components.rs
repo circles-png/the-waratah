@@ -27,11 +27,11 @@ use rand::thread_rng;
 #[component]
 pub fn App() -> impl IntoView {
     view! {
-        <Router base=option_env!("BASE_URL").unwrap_or_default()>
+        <Router>
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
-                    <Routes base=option_env!("BASE_URL").unwrap_or_default().to_string()>
+                    <Routes>
                         <Route path="/" view=ArticlePreviews/>
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/crosswords/:id" view=Crossword/>

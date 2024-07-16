@@ -13,3 +13,8 @@ leptos = { version = "0.6.11", features = ["csr", "nightly"] }
 leptos_router = { version = "0.6.11", features = ["csr", "nightly"] }
 rand = "0.8.5"
 strum = { version = "0.26.2", features = ["derive"] }
+
+[build-dependencies]
+itertools = "0.13.0"
+proc-macro2 = "1.0.86"
+syn = "2.0.71"
