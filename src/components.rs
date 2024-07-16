@@ -90,7 +90,7 @@ pub fn ArticlePreviews() -> impl IntoView {
     let (filter, set_filter) = create_signal(None::<&str>);
     view! {
         <div class="flex flex-col gap-2">
-            <div class="flex *:px-2 divide-x font-serif justify-center">
+            <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
 
                 {move || {
                     ARTICLES
