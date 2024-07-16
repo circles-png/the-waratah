@@ -3,6 +3,7 @@ use itertools::Itertools;
 use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
+use rand::rngs::StdRng;
 use std::collections::HashMap;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
@@ -12,7 +13,7 @@ use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use crate::crossword::CROSSWORDS;
-use chrono::Local;
+use chrono::{Local, NaiveDate};
 
 use leptos::{
     component, create_memo, create_signal, event_target, view, window_event_listener, Callback,
@@ -22,7 +23,7 @@ use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
 use leptos_router::{use_params_map, Params};
 use rand::seq::SliceRandom;
-use rand::thread_rng;
+use rand::{thread_rng, SeedableRng};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -88,6 +89,12 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 pub fn ArticlePreviews() -> impl IntoView {
     const ALL: &str = "All";
     let (filter, set_filter) = create_signal(None::<&str>);
+    let mut big_format_articles = ARTICLES.to_vec();
+    #[allow(clippy::cast_sign_loss)]
+    let mut rng =
+        StdRng::seed_from_u64((Local::now().date_naive() - NaiveDate::MIN).num_days() as u64);
+    big_format_articles.shuffle(&mut rng);
+    let mut big_format_articles = big_format_articles.into_iter();
     view! {
         <div class="flex flex-col gap-2">
             <div class="flex *:px-2 divide-x font-serif justify-center">
@@ -117,6 +124,25 @@ pub fn ArticlePreviews() -> impl IntoView {
                         .collect_view()
                 }}
 
+            </div>
+            <div class="grid grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4">
+                <div class="col-span-2">
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                </div>
+                <div class="flex flex-col row-span-3 gap-2">
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                </div>
+                <div>
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                </div>
+                <div>
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                </div>
+                <div class="col-span-2">
+                    <ArticlePreview article=big_format_articles.next().unwrap()/>
+                </div>
             </div>
             <div class="flex flex-col gap-2">
                 {move || {
