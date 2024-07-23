@@ -3,6 +3,7 @@ use itertools::Itertools;
 use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
+use leptos_meta::{provide_meta_context, Meta};
 use std::collections::HashMap;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
@@ -26,6 +27,7 @@ use rand::thread_rng;
 
 #[component]
 pub fn App() -> impl IntoView {
+    provide_meta_context();
     view! {
         <Router base=option_env!("BASE_URL").unwrap_or_default()>
             <div class="flex flex-col h-full">
@@ -36,11 +38,22 @@ pub fn App() -> impl IntoView {
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/crosswords/:id" view=Crossword/>
                         <Route path="/*" view=|| "404"/>
+                        <Route path="/disclaimer/" view=Disclaimer/>
                     </Routes>
                 </PageContainer>
                 <Footer/>
             </div>
         </Router>
+    }
+}
+
+#[component]
+pub fn Disclaimer() -> impl IntoView {
+    view! {
+        <div class="flex flex-col">
+            <Heading>Disclaimer</Heading>
+            "The Yesterday would like to disclaim many things, solely to avoid all responsibility for anything and everything."
+        </div>
     }
 }
 
@@ -89,6 +102,10 @@ pub fn ArticlePreviews() -> impl IntoView {
     const ALL: &str = "All";
     let (filter, set_filter) = create_signal(None::<&str>);
     view! {
+        <Meta
+            name="description"
+            content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
+        />
         <div class="flex flex-col gap-2">
             <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
 
@@ -220,6 +237,7 @@ pub fn Article() -> impl IntoView {
         })
     };
     view! {
+        <Meta name="description" content=article().blurb/>
         <div class="flex flex-col gap-4">
             <div>
                 <Heading>{move || article().title.to_uppercase()}</Heading>
@@ -351,9 +369,9 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                <div class="hidden sm:block">
+                <A class="hidden sm:block" href="/disclaimer">
                     "Brought to you by incredible (and a few credible) reporters."
-                </div>
+                </A>
             </div>
         </footer>
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
