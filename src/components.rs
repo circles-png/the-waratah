@@ -3,6 +3,7 @@ use itertools::Itertools;
 use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
+use leptos_meta::{provide_meta_context, Meta};
 use rand::rngs::StdRng;
 use std::collections::HashMap;
 use std::iter::once;
@@ -27,21 +28,33 @@ use rand::{thread_rng, SeedableRng};
 
 #[component]
 pub fn App() -> impl IntoView {
+    provide_meta_context();
     view! {
-        <Router base=option_env!("BASE_URL").unwrap_or_default()>
+        <Router>
             <div class="flex flex-col h-full">
                 <Header/>
                 <PageContainer>
-                    <Routes base=option_env!("BASE_URL").unwrap_or_default().to_string()>
+                    <Routes>
                         <Route path="/" view=ArticlePreviews/>
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/crosswords/:id" view=Crossword/>
                         <Route path="/*" view=|| "404"/>
+                        <Route path="/disclaimer/" view=Disclaimer/>
                     </Routes>
                 </PageContainer>
                 <Footer/>
             </div>
         </Router>
+    }
+}
+
+#[component]
+pub fn Disclaimer() -> impl IntoView {
+    view! {
+        <div class="flex flex-col">
+            <Heading>Disclaimer</Heading>
+            "The Yesterday disclaims anything and everything, in order to avoid all responsibility for it all."
+        </div>
     }
 }
 
@@ -78,7 +91,11 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    view! { <div class="w-full px-16 shrink-0">{children()}</div> }
+    view! {
+        <main class="flex justify-center gap-4 p-4 grow">
+            <div class="w-full max-w-4xl shrink-0">{children()}</div>
+        </main>
+    }
 }
 
 #[component]
@@ -92,8 +109,12 @@ pub fn ArticlePreviews() -> impl IntoView {
     big_format_articles.shuffle(&mut rng);
     let mut big_format_articles = big_format_articles.into_iter();
     view! {
+        <Meta
+            name="description"
+            content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
+        />
         <div class="flex flex-col gap-2">
-            <div class="flex *:px-2 divide-x font-serif justify-center">
+            <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
 
                 {move || {
                     ARTICLES
@@ -121,7 +142,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                 }}
 
             </div>
-            <div class="grid grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4">
+            <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
                 <div class="col-span-2">
                     <ArticlePreview article=big_format_articles.next().unwrap()/>
                 </div>
@@ -242,6 +263,7 @@ pub fn Article() -> impl IntoView {
         })
     };
     view! {
+        <Meta name="description" content=article().blurb/>
         <div class="flex flex-col gap-4">
             <div>
                 <Heading>{move || article().title.to_uppercase()}</Heading>
@@ -373,9 +395,9 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                <div class="hidden sm:block">
+                <A class="hidden sm:block" href="/disclaimer">
                     "Brought to you by incredible (and a few credible) reporters."
-                </div>
+                </A>
             </div>
         </footer>
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
