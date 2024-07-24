@@ -52,7 +52,7 @@ pub fn Disclaimer() -> impl IntoView {
     view! {
         <div class="flex flex-col">
             <Heading>Disclaimer</Heading>
-            "The Yesterday would like to disclaim many things, solely to avoid all responsibility for anything and everything."
+            "The Yesterday disclaims anything and everything, solely to avoid all responsibility for anything and everything."
         </div>
     }
 }
