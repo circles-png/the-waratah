@@ -78,11 +78,7 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    view! {
-        <main class="flex justify-center gap-4 p-4 grow">
-            <div class="w-full max-w-2xl shrink-0">{children()}</div>
-        </main>
-    }
+    view! { <div class="w-full px-16 shrink-0">{children()}</div> }
 }
 
 #[component]
