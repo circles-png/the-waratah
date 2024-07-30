@@ -38,22 +38,11 @@ pub fn App() -> impl IntoView {
                         <Route path="/articles/:id" view=Article/>
                         <Route path="/crosswords/:id" view=Crossword/>
                         <Route path="/*" view=|| "404"/>
-                        <Route path="/disclaimer/" view=Disclaimer/>
                     </Routes>
                 </PageContainer>
                 <Footer/>
             </div>
         </Router>
-    }
-}
-
-#[component]
-pub fn Disclaimer() -> impl IntoView {
-    view! {
-        <div class="flex flex-col">
-            <Heading>Disclaimer</Heading>
-            "The Yesterday disclaims anything and everything, in order to avoid all responsibility for it all."
-        </div>
     }
 }
 
