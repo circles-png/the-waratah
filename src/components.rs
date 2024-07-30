@@ -358,9 +358,7 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                <A class="hidden sm:block" href="/disclaimer">
                     "Brought to you by incredible (and a few credible) reporters."
-                </A>
             </div>
         </footer>
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
