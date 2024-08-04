@@ -88,7 +88,7 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 
 #[component]
 pub fn ArticlePreviews() -> impl IntoView {
-    const ALL: &str = "All";
+    const ALL: &str = "Archive";
     let (filter, set_filter) = create_signal(None::<&str>);
     view! {
         <Meta
