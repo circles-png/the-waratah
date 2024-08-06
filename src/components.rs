@@ -6,6 +6,7 @@ use leptos::web_sys::HtmlButtonElement;
 use leptos_meta::{provide_meta_context, Meta};
 use rand::rngs::StdRng;
 use std::collections::HashMap;
+use std::iter::from_fn;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
 use std::str::FromStr;
@@ -88,15 +89,10 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 }
 
 #[component]
+#[allow(clippy::too_many_lines)]
 pub fn ArticlePreviews() -> impl IntoView {
-    const ALL: &str = "Archive";
+    const ARCHIVE: &str = "Archive";
     let (filter, set_filter) = create_signal(None::<&str>);
-    let mut big_format_articles = ARTICLES.to_vec();
-    #[allow(clippy::cast_sign_loss)]
-    let mut rng =
-        StdRng::seed_from_u64((Local::now().date_naive() - NaiveDate::MIN).num_days() as u64);
-    big_format_articles.shuffle(&mut rng);
-    let mut big_format_articles = big_format_articles.into_iter();
     view! {
         <Meta
             name="description"
@@ -109,7 +105,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                     ARTICLES
                         .iter()
                         .map(|article| article.topic)
-                        .chain(once(ALL))
+                        .chain(once(ARCHIVE))
                         .unique()
                         .map(|topic| {
                             view! {
@@ -131,59 +127,81 @@ pub fn ArticlePreviews() -> impl IntoView {
                 }}
 
             </div>
-            <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
-                <div class="col-span-2">
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                </div>
-                <div class="flex flex-col row-span-3 gap-2">
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                </div>
-                <div>
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                </div>
-                <div>
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                </div>
-                <div class="col-span-2">
-                    <ArticlePreview article=big_format_articles.next().unwrap()/>
-                </div>
-            </div>
             <div class="flex flex-col gap-2">
                 {move || {
                     const LATEST: &str = "Latest";
                     once(LATEST)
                         .chain(ARTICLES.iter().map(|article| article.topic).unique())
-                        .chain(once(ALL))
+                        .chain(once(ARCHIVE))
                         .filter(|topic| {
-                            filter.get().as_ref().map_or(*topic != ALL, |filter| topic == filter)
+                            filter
+                                .get()
+                                .as_ref()
+                                .map_or(*topic != ARCHIVE, |filter| topic == filter)
                         })
                         .map(|topic| {
                             view! {
                                 <Heading>{topic}</Heading>
                                 <Divider/>
-                                <div class="flex flex-col grid-cols-2 gap-8 sm:grid">
-                                    {move || {
-                                        match topic {
-                                            LATEST => ARTICLES.iter().take(6).cloned().collect_vec(),
-                                            ALL => ARTICLES.iter().cloned().collect_vec(),
-                                            _ => {
-                                                ARTICLES
-                                                    .iter()
-                                                    .filter(|article| article.topic == topic)
-                                                    .cloned()
-                                                    .collect_vec()
+                                {move || {
+                                    #[allow(clippy::cast_sign_loss)]
+                                    let mut rng = StdRng::seed_from_u64(
+                                        (Local::now().date_naive() - NaiveDate::MIN).num_days()
+                                            as u64,
+                                    );
+                                    let articles = if matches!(topic, LATEST | ARCHIVE) {
+                                        ARTICLES.iter().cloned().collect_vec()
+                                    } else {
+                                        let mut articles = ARTICLES
+                                            .iter()
+                                            .filter(|article| article.topic == topic)
+                                            .cloned()
+                                            .collect_vec();
+                                        articles.shuffle(&mut rng);
+                                        articles
+                                    };
+                                    let mut articles = articles.into_iter();
+                                    let mut next = || {
+                                        articles
+                                            .next()
+                                            .map(|article| {
+                                                view! { <ArticlePreview article=article/> }
+                                            })
+                                    };
+                                    match topic {
+                                        LATEST => {
+                                            view! {
+                                                <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
+                                                    <div class="col-span-2">{next()}</div>
+                                                    <div class="flex flex-col row-span-3 gap-2">
+                                                        {next()} {next()} {next()}
+                                                    </div>
+                                                    <div>{next()}</div>
+                                                    <div>{next()}</div>
+                                                    <div class="col-span-2">{next()}</div>
+                                                </div>
                                             }
                                         }
-                                            .iter()
-                                            .map(|article| {
-                                                view! { <ArticlePreview article=article.clone()/> }
-                                            })
-                                            .collect_view()
-                                    }}
-
-                                </div>
+                                        ARCHIVE => {
+                                            view! {
+                                                <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
+                                                    {from_fn(next).collect_view()}
+                                                </div>
+                                            }
+                                        }
+                                        _ => {
+                                            view! {
+                                                <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
+                                                    <div class="col-span-2 row-span-2">{next()}</div>
+                                                    <div>{next()}</div>
+                                                    <div>{next()}</div>
+                                                    <div>{next()}</div>
+                                                    <div>{next()}</div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                }}
                             }
                         })
                         .collect_view()
@@ -384,7 +402,7 @@ pub fn Footer() -> impl IntoView {
             </A>
             <div class="flex justify-between">
                 <div>"Copyright \u{a9} 2024"</div>
-                    "Brought to you by incredible (and a few credible) reporters."
+                "Brought to you by incredible (and a few credible) reporters."
             </div>
         </footer>
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
