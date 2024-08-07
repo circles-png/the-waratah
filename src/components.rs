@@ -178,7 +178,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
+                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] *:px-4 divide-x hidden md:grid">
                                                         <div class="col-span-2">{next!(hero)}</div>
                                                         <div class="flex flex-col row-span-3 *:py-2 divide-y divide-gray-300">
                                                             {from_fn(|| next!(no_image)).take(4).collect_view()}
@@ -328,7 +328,11 @@ pub fn ArticlePreview(
                     .then_some(
                         view! {
                             <Caption>
-                                <div class="text-left">{article.blurb}</div>
+                                <div class=if layout.size == ArticleSize::Hero {
+                                    "text-base text-left"
+                                } else {
+                                    "text-sm text-left"
+                                }>{article.blurb}</div>
                             </Caption>
                         },
                     )}
