@@ -33,15 +33,51 @@ pub fn App() -> impl IntoView {
         <Router>
             <div class="flex flex-col h-full">
                 <Header />
-                <PageContainer>
-                    <Routes>
-                        <Route path="/" view=ArticlePreviews />
-                        <Route path="/articles/:id" view=Article />
-                        <Route path="/crosswords/:id" view=Crossword />
-                        <Route path="/*" view=|| "404" />
-                    </Routes>
-                </PageContainer>
-                <Footer />
+                <Routes>
+                    <Route
+                        path="/"
+                        view=|| {
+                            view! {
+                                <PageContainer>
+                                    <ArticlePreviews />
+                                </PageContainer>
+                                <Footer />
+                            }
+                        }
+                    />
+                    <Route
+                        path="/articles/:id"
+                        view=|| {
+                            view! {
+                                <PageContainer>
+                                    <Article />
+                                </PageContainer>
+                                <Footer ads=true />
+                            }
+                        }
+                    />
+                    <Route
+                        path="/crosswords/:id"
+                        view=|| {
+                            view! {
+                                <PageContainer>
+                                    <Crossword />
+                                </PageContainer>
+                                <Footer />
+                            }
+                        }
+                    />
+                    <Route
+                        path="/*"
+                        view=|| {
+                            view! {
+                                <PageContainer>404</PageContainer>
+                                <Footer />
+                            }
+                        }
+                    />
+                </Routes>
+
             </div>
         </Router>
     }
@@ -137,10 +173,9 @@ pub fn ArticlePreviews() -> impl IntoView {
                             })
                             .map(|topic| {
                                 view! {
+                                    <Divider />
                                     {(topic != LATEST)
                                         .then_some(view! { <Heading>{topic}</Heading> })}
-
-                                    <Divider />
                                     {move || {
                                         let articles = if matches!(topic, LATEST | ARCHIVE) {
                                             ARTICLES.iter().cloned().collect_vec()
@@ -186,7 +221,8 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                             </div>
                                                         </div>
                                                         <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
-                                                            {from_fn(|| next!(no_image)).take(4).collect_view()}
+                                                            {next!()}
+                                                            {from_fn(|| next!(no_image)).take(3).collect_view()}
                                                         </div>
                                                     </div>
                                                 }
@@ -330,8 +366,8 @@ pub fn ArticlePreview(
                             <Caption>
                                 <div class=format!(
                                     "text-left {}",
-                                    (layout.size != ArticleSize::Hero)
-                                        .then_some("text-sm")
+                                    (layout.size == ArticleSize::Hero)
+                                        .then_some("text-lg")
                                         .unwrap_or_default(),
                                 )>{article.blurb}</div>
                             </Caption>
@@ -481,7 +517,7 @@ pub fn Heading(children: Children) -> impl IntoView {
 }
 
 #[component]
-pub fn Footer() -> impl IntoView {
+pub fn Footer(#[prop(optional)] ads: bool) -> impl IntoView {
     let ad = ADS.choose(&mut thread_rng()).unwrap();
     let (show_overlay, set_show_overlay) = create_signal(false);
     view! {
@@ -496,62 +532,69 @@ pub fn Footer() -> impl IntoView {
                 "Brought to you by incredible (and a few credible) reporters."
             </div>
         </footer>
-        <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
-            <div class="relative">
-                <div class="relative">
-                    <img
-                        src=format!("/images/horizontal-ads/{}", *ad)
-                        class="h-24 cursor-pointer"
-                    />
-                    <div class=move || {
-                        format!(
-                            "absolute inset-0 z-10 flex flex-col items-center gap-1 p-2 bg-gray-100 border text-neutral-500 {}",
-                            if show_overlay.get().not() {
-                                "opacity-0 pointer-events-none"
-                            } else {
-                                "opacity-100 transition-opacity duration-1000"
-                            },
-                        )
-                    }>
-                        <button
-                            class="absolute top-0 left-0 p-2 text-2xl leading-none"
-                            on:click=move |_| set_show_overlay(false)
-                        >
-                            "\u{2190}"
-                        </button>
-                        <h1 class="text-sm">
-                            "Ads not by " <span class="font-bold">"Google"</span>
-                        </h1>
-                        <div class="flex flex-col w-full gap-1 px-16 text-xs">
+        {ads
+            .then_some(
+                view! {
+                    <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
+                        <div class="relative">
+                            <div class="relative">
+                                <img
+                                    src=format!("/images/horizontal-ads/{}", *ad)
+                                    class="h-24 cursor-pointer"
+                                />
+                                <div class=move || {
+                                    format!(
+                                        "absolute inset-0 z-10 flex flex-col items-center gap-1 p-2 bg-gray-100 border text-neutral-500 {}",
+                                        if show_overlay.get().not() {
+                                            "opacity-0 pointer-events-none"
+                                        } else {
+                                            "opacity-100 transition-opacity duration-1000"
+                                        },
+                                    )
+                                }>
+                                    <button
+                                        class="absolute top-0 left-0 p-2 text-2xl leading-none"
+                                        on:click=move |_| set_show_overlay(false)
+                                    >
+                                        "\u{2190}"
+                                    </button>
+                                    <h1 class="text-sm">
+                                        "Ads not by " <span class="font-bold">"Google"</span>
+                                    </h1>
+                                    <div class="flex flex-col w-full gap-1 px-16 text-xs">
+                                        <button
+                                            class="w-full py-1 text-white bg-blue-500 rounded-sm shadow"
+                                            on:click=move |_| set_show_overlay(false)
+                                        >
+                                            "Keep seeing this ad"
+                                        </button>
+                                        <button
+                                            class="w-full py-1 bg-white rounded-sm shadow"
+                                            on:click=move |_| set_show_overlay(false)
+                                        >
+                                            "Why not this ad? \u{25B7}"
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-center opacity-50">"Advertisement"</div>
                             <button
-                                class="w-full py-1 text-white bg-blue-500 rounded-sm shadow"
-                                on:click=move |_| set_show_overlay(false)
+                                class="absolute top-0 right-0 flex text-xs leading-none text-blue-500"
+                                on:click=move |_| set_show_overlay(true)
                             >
-                                "Keep seeing this ad"
-                            </button>
-                            <button
-                                class="w-full py-1 bg-white rounded-sm shadow"
-                                on:click=move |_| set_show_overlay(false)
-                            >
-                                "Why not this ad? \u{25B7}"
+                                <div class="grid border bg-gray-100/50 size-4 place-content-center">
+                                    <div class="cursor-pointer border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
+                                        i
+                                    </div>
+                                </div>
+                                <div class="grid border place-content-center bg-gray-100/50 size-4">
+                                    "X"
+                                </div>
                             </button>
                         </div>
                     </div>
-                </div>
-                <div class="text-sm text-center opacity-50">"Advertisement"</div>
-                <button
-                    class="absolute top-0 right-0 flex text-xs leading-none text-blue-500"
-                    on:click=move |_| set_show_overlay(true)
-                >
-                    <div class="grid border bg-gray-100/50 size-4 place-content-center">
-                        <div class="cursor-pointer border rounded-full text-[8px] aspect-square size-3 grid place-content-center border-blue-500 font-medium">
-                            i
-                        </div>
-                    </div>
-                    <div class="grid border place-content-center bg-gray-100/50 size-4">"X"</div>
-                </button>
-            </div>
-        </div>
+                },
+            )}
     }
 }
 
