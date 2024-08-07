@@ -5,6 +5,7 @@ use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
 use leptos_meta::{provide_meta_context, Meta};
 use std::collections::HashMap;
+use std::iter::from_fn;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
 use std::str::FromStr;
@@ -31,16 +32,16 @@ pub fn App() -> impl IntoView {
     view! {
         <Router>
             <div class="flex flex-col h-full">
-                <Header/>
+                <Header />
                 <PageContainer>
                     <Routes>
-                        <Route path="/" view=ArticlePreviews/>
-                        <Route path="/articles/:id" view=Article/>
-                        <Route path="/crosswords/:id" view=Crossword/>
-                        <Route path="/*" view=|| "404"/>
+                        <Route path="/" view=ArticlePreviews />
+                        <Route path="/articles/:id" view=Article />
+                        <Route path="/crosswords/:id" view=Crossword />
+                        <Route path="/*" view=|| "404" />
                     </Routes>
                 </PageContainer>
-                <Footer/>
+                <Footer />
             </div>
         </Router>
     }
@@ -136,8 +137,10 @@ pub fn ArticlePreviews() -> impl IntoView {
                             })
                             .map(|topic| {
                                 view! {
-                                    <Heading>{topic}</Heading>
-                                    <Divider/>
+                                    {(topic != LATEST)
+                                        .then_some(view! { <Heading>{topic}</Heading> })}
+
+                                    <Divider />
                                     {move || {
                                         let articles = if matches!(topic, LATEST | ARCHIVE) {
                                             ARTICLES.iter().cloned().collect_vec()
@@ -152,28 +155,39 @@ pub fn ArticlePreviews() -> impl IntoView {
                                         let all = articles
                                             .clone()
                                             .map(|article| {
-                                                view! { <ArticlePreview article=article/> }
+                                                view! { <ArticlePreview article=article /> }
                                             })
                                             .collect_vec();
-                                        let mut next = || {
-                                            articles
-                                                .next()
-                                                .map(|article| {
-                                                    view! { <ArticlePreview article=article/> }
-                                                })
-                                        };
+                                        macro_rules! next {
+                                            () => {
+                                                articles.next().map(| article | { view! { < ArticlePreview
+                                                article = article /> } })
+                                            };
+                                            (hero) => {
+                                                articles.next().map(| article | { view! { < ArticlePreview
+                                                article = article layout = ArticlePreviewLayout::default()
+                                                .hero() /> } })
+                                            };
+                                            (no_image) => {
+                                                articles.next().map(| article | { view! { < ArticlePreview
+                                                article = article layout = ArticlePreviewLayout::default()
+                                                .without_image() /> } })
+                                            };
+                                        }
                                         match topic {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
                                                     <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
-                                                        <div class="col-span-2">{next()}</div>
-                                                        <div class="flex flex-col row-span-3 gap-2">
-                                                            {next()} {next()} {next()}
+                                                        <div class="col-span-2">{next!(hero)}</div>
+                                                        <div class="flex flex-col row-span-3 *:py-2 divide-y divide-gray-300">
+                                                            {from_fn(|| next!(no_image)).take(4).collect_view()}
                                                         </div>
-                                                        <div>{next()}</div>
-                                                        <div>{next()}</div>
-                                                        <div class="col-span-2">{next()}</div>
+                                                        <div class="flex col-span-2 gap-4 *:basis-0 *:grow">
+                                                            <div>{next!()}</div>
+                                                            <div>{next!()}</div>
+                                                        </div>
+                                                        <div class="col-span-2">{next!()}</div>
                                                     </div>
                                                 }
                                             }
@@ -190,11 +204,11 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
                                                     <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
-                                                        <div class="col-span-2 row-span-2">{next()}</div>
-                                                        <div>{next()}</div>
-                                                        <div>{next()}</div>
-                                                        <div>{next()}</div>
-                                                        <div>{next()}</div>
+                                                        <div class="col-span-2 row-span-2">{next!()}</div>
+                                                        <div>{next!()}</div>
+                                                        <div>{next!()}</div>
+                                                        <div>{next!()}</div>
+                                                        <div>{next!()}</div>
                                                     </div>
                                                 }
                                             }
@@ -211,40 +225,110 @@ pub fn ArticlePreviews() -> impl IntoView {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ArticlePreviewLayout {
+    blurb: bool,
+    image: bool,
+    direction: ArticleDirection,
+    size: ArticleSize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ArticleDirection {
+    Horizontal,
+    Vertical,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ArticleSize {
+    Hero,
+    Normal,
+}
+
+impl ArticlePreviewLayout {
+    const fn without_blurb(self) -> Self {
+        Self {
+            blurb: false,
+            ..self
+        }
+    }
+    const fn without_image(self) -> Self {
+        Self {
+            image: false,
+            ..self
+        }
+    }
+    const fn horizontal(self) -> Self {
+        Self {
+            direction: ArticleDirection::Horizontal,
+            ..self
+        }
+    }
+    const fn hero(self) -> Self {
+        Self {
+            size: ArticleSize::Hero,
+            ..self
+        }
+    }
+}
+
+impl Default for ArticlePreviewLayout {
+    fn default() -> Self {
+        Self {
+            blurb: true,
+            image: true,
+            direction: ArticleDirection::Vertical,
+            size: ArticleSize::Normal,
+        }
+    }
+}
+
 #[component]
 #[allow(clippy::needless_pass_by_value)]
 pub fn ArticlePreview(
     article: Article,
-    #[prop(optional)] no_blurb: bool,
-    #[prop(optional)] horizontal: bool,
+    #[prop(optional)] layout: ArticlePreviewLayout,
 ) -> impl IntoView {
     view! {
         <A
             class=format!(
                 "flex gap-3 {}",
-                horizontal.not().then_some("flex-col").unwrap_or_default(),
+                match (layout.direction, layout.size) {
+                    (ArticleDirection::Horizontal, ArticleSize::Hero) => "flex-row-reverse",
+                    (ArticleDirection::Horizontal, ArticleSize::Normal) => "flex-row",
+                    (ArticleDirection::Vertical, ArticleSize::Hero) => "flex-col-reverse",
+                    (ArticleDirection::Vertical, ArticleSize::Normal) => "flex-col",
+                },
             )
 
             href=format!("/articles/{}", article.id)
         >
-            <img
-                src=article.image.url
-                alt=article.image.caption
-                class="object-cover w-full aspect-[3/2]"
-            />
+            {layout
+                .image
+                .then_some(
+                    view! {
+                        <img
+                            src=article.image.url
+                            alt=article.image.caption
+                            class="object-cover w-full aspect-[3/2]"
+                        />
+                    },
+                )}
             <div>
-                <small class="text-sm font-light text-blue-800">
-                    {article.topic.to_uppercase()}
-                </small>
+                <div class="font-light text-blue-800">{article.topic.to_uppercase()}</div>
                 <Heading>
-                    <article class="text-xl">{article.title}</article>
+                    <article class=if layout.size == ArticleSize::Hero {
+                        "text-4xl"
+                    } else {
+                        "text-2xl"
+                    }>{article.title}</article>
                 </Heading>
-                {no_blurb
-                    .not()
+                {layout
+                    .blurb
                     .then_some(
                         view! {
                             <Caption>
-                                <div class="text-sm text-left">{article.blurb}</div>
+                                <div class="text-left">{article.blurb}</div>
                             </Caption>
                         },
                     )}
@@ -269,7 +353,7 @@ pub fn Article() -> impl IntoView {
         })
     };
     view! {
-        <Meta name="description" content=article().blurb/>
+        <Meta name="description" content=article().blurb />
         <div class="w-full max-w-2xl shrink-0">
             <div class="flex flex-col gap-4">
                 <div>
@@ -292,7 +376,7 @@ pub fn Article() -> impl IntoView {
                     />
                     <Caption>{move || article().image.caption}</Caption>
                 </div>
-                <Divider/>
+                <Divider />
                 <div class="flex flex-col gap-5 sm:text-lg
                 [&>div:first-child>p]:first-letter:text-[2.8rem]
                 sm:[&>div:first-child>p]:first-letter:text-[3.5rem]
@@ -310,7 +394,7 @@ pub fn Article() -> impl IntoView {
                                     Fragment::Image(Image { url, caption }) => {
                                         view! {
                                             <div class="px-16">
-                                                <img src=*url alt=*caption class="object-cover w-full"/>
+                                                <img src=*url alt=*caption class="object-cover w-full" />
                                                 <Caption>{*caption}</Caption>
                                             </div>
                                         }
@@ -328,8 +412,8 @@ pub fn Article() -> impl IntoView {
                     }}
 
                 </div>
-                <Divider/>
-                <ReadMore this_article=article/>
+                <Divider />
+                <ReadMore this_article=article />
             </div>
         </div>
     }
@@ -372,8 +456,9 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
                             view! {
                                 <ArticlePreview
                                     article=article.clone()
-                                    horizontal=true
-                                    no_blurb=true
+                                    layout=ArticlePreviewLayout::default()
+                                        .without_blurb()
+                                        .horizontal()
                                 />
                             }
                         })
@@ -409,7 +494,10 @@ pub fn Footer() -> impl IntoView {
         <div class="sticky bottom-0 flex justify-center w-full p-2 bg-gray-100 border">
             <div class="relative">
                 <div class="relative">
-                    <img src=format!("/images/horizontal-ads/{}", *ad) class="h-24 cursor-pointer"/>
+                    <img
+                        src=format!("/images/horizontal-ads/{}", *ad)
+                        class="h-24 cursor-pointer"
+                    />
                     <div class=move || {
                         format!(
                             "absolute inset-0 z-10 flex flex-col items-center gap-1 p-2 bg-gray-100 border text-neutral-500 {}",
@@ -757,8 +845,7 @@ pub fn Crossword() -> impl IntoView {
                             on_solution_change=set_solution
                         />
                     }
-                }}
-                <div class="flex justify-center">
+                }} <div class="flex justify-center">
                     <button
                         class="px-4 py-2 text-white bg-black rounded disabled:hidden"
                         disabled=move || {
