@@ -131,33 +131,31 @@ pub fn ArticlePreviews() -> impl IntoView {
         />
         <div class="w-full max-w-6xl shrink-0">
             <div class="flex flex-col gap-2">
-                <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
-
-                    {move || {
-                        ARTICLES
-                            .iter()
-                            .map(|article| article.topic)
-                            .chain(once(ARCHIVE))
-                            .unique()
-                            .map(|topic| {
-                                view! {
-                                    <button
-                                        class=filter
-                                            .get()
-                                            .as_ref()
-                                            .map_or(false, |filter| topic == *filter)
-                                            .then_some("text-blue-800")
-
-                                        on:click=move |_| set_filter(Some(topic))
-                                    >
-
-                                        {topic}
-                                    </button>
-                                }
-                            })
-                            .collect_view()
-                    }}
-
+                <div class="flex justify-center">
+                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-b border-black pb-2">
+                        {move || {
+                            ARTICLES
+                                .iter()
+                                .map(|article| article.topic)
+                                .chain(once(ARCHIVE))
+                                .unique()
+                                .map(|topic| {
+                                    view! {
+                                        <button
+                                            class=filter
+                                                .get()
+                                                .as_ref()
+                                                .map_or(false, |filter| topic == *filter)
+                                                .then_some("text-blue-800")
+                                            on:click=move |_| set_filter(Some(topic))
+                                        >
+                                            {topic}
+                                        </button>
+                                    }
+                                })
+                                .collect_view()
+                        }}
+                    </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     {move || {
@@ -173,9 +171,13 @@ pub fn ArticlePreviews() -> impl IntoView {
                             })
                             .map(|topic| {
                                 view! {
-                                    <Divider />
                                     {(topic != LATEST)
-                                        .then_some(view! { <Heading>{topic}</Heading> })}
+                                        .then_some(
+                                            view! {
+                                                <Divider />
+                                                <Heading>{topic}</Heading>
+                                            },
+                                        )}
                                     {move || {
                                         let articles = if matches!(topic, LATEST | ARCHIVE) {
                                             ARTICLES.iter().cloned().collect_vec()
@@ -220,7 +222,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                                 <div>{next!()}</div>
                                                             </div>
                                                         </div>
-                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
+                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-2 last:*:pb-2 w-1/3">
                                                             {next!()}
                                                             {from_fn(|| next!(no_image)).take(3).collect_view()}
                                                         </div>
