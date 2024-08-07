@@ -4,7 +4,6 @@ use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
 use leptos_meta::{provide_meta_context, Meta};
-use rand::rngs::StdRng;
 use std::collections::HashMap;
 use std::iter::from_fn;
 use std::iter::once;
@@ -15,7 +14,7 @@ use crate::ad::ADS;
 use crate::article::{Article, ARTICLES};
 use crate::article::{Fragment, Image};
 use crate::crossword::CROSSWORDS;
-use chrono::{Local, NaiveDate};
+use chrono::Local;
 
 use leptos::{
     component, create_memo, create_signal, event_target, view, window_event_listener, Callback,
@@ -25,7 +24,7 @@ use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
 use leptos_router::{use_params_map, Params};
 use rand::seq::SliceRandom;
-use rand::{thread_rng, SeedableRng};
+use rand::thread_rng;
 
 #[component]
 pub fn App() -> impl IntoView {
