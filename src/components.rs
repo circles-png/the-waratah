@@ -5,7 +5,6 @@ use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
 use leptos_meta::{provide_meta_context, Meta};
 use std::collections::HashMap;
-use std::iter::from_fn;
 use std::iter::once;
 use std::ops::{Index, Neg, Not};
 use std::str::FromStr;
@@ -80,11 +79,7 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    view! {
-        <main class="flex justify-center gap-4 p-4 grow">
-            <div class="w-full max-w-4xl shrink-0">{children()}</div>
-        </main>
-    }
+    view! { <main class="flex justify-center gap-4 p-4 grow">{children()}</main> }
 }
 
 #[component]
@@ -97,108 +92,120 @@ pub fn ArticlePreviews() -> impl IntoView {
             name="description"
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
-        <div class="flex flex-col gap-2">
-            <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
-
-                {move || {
-                    ARTICLES
-                        .iter()
-                        .map(|article| article.topic)
-                        .chain(once(ARCHIVE))
-                        .unique()
-                        .map(|topic| {
-                            view! {
-                                <button
-                                    class=filter
-                                        .get()
-                                        .as_ref()
-                                        .map_or(false, |filter| topic == *filter)
-                                        .then_some("text-blue-800")
-
-                                    on:click=move |_| set_filter(Some(topic))
-                                >
-
-                                    {topic}
-                                </button>
-                            }
-                        })
-                        .collect_view()
-                }}
-
-            </div>
+        <div class="w-full max-w-4xl shrink-0">
             <div class="flex flex-col gap-2">
-                {move || {
-                    const LATEST: &str = "Latest";
-                    once(LATEST)
-                        .chain(ARTICLES.iter().map(|article| article.topic).unique())
-                        .chain(once(ARCHIVE))
-                        .filter(|topic| {
-                            filter
-                                .get()
-                                .as_ref()
-                                .map_or(*topic != ARCHIVE, |filter| topic == filter)
-                        })
-                        .map(|topic| {
-                            view! {
-                                <Heading>{topic}</Heading>
-                                <Divider/>
-                                {move || {
-                                    let articles = if matches!(topic, LATEST | ARCHIVE) {
-                                        ARTICLES.iter().cloned().collect_vec()
-                                    } else {
-                                        ARTICLES
-                                            .iter()
-                                            .filter(|article| article.topic == topic)
-                                            .cloned()
-                                            .collect_vec()
-                                    };
-                                    let mut articles = articles.into_iter();
-                                    let mut next = || {
-                                        articles
-                                            .next()
+                <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
+
+                    {move || {
+                        ARTICLES
+                            .iter()
+                            .map(|article| article.topic)
+                            .chain(once(ARCHIVE))
+                            .unique()
+                            .map(|topic| {
+                                view! {
+                                    <button
+                                        class=filter
+                                            .get()
+                                            .as_ref()
+                                            .map_or(false, |filter| topic == *filter)
+                                            .then_some("text-blue-800")
+
+                                        on:click=move |_| set_filter(Some(topic))
+                                    >
+
+                                        {topic}
+                                    </button>
+                                }
+                            })
+                            .collect_view()
+                    }}
+
+                </div>
+                <div class="flex flex-col gap-2">
+                    {move || {
+                        const LATEST: &str = "Latest";
+                        once(LATEST)
+                            .chain(ARTICLES.iter().map(|article| article.topic).unique())
+                            .chain(once(ARCHIVE))
+                            .filter(|topic| {
+                                filter
+                                    .get()
+                                    .as_ref()
+                                    .map_or(*topic != ARCHIVE, |filter| topic == filter)
+                            })
+                            .map(|topic| {
+                                view! {
+                                    <Heading>{topic}</Heading>
+                                    <Divider/>
+                                    {move || {
+                                        let articles = if matches!(topic, LATEST | ARCHIVE) {
+                                            ARTICLES.iter().cloned().collect_vec()
+                                        } else {
+                                            ARTICLES
+                                                .iter()
+                                                .filter(|article| article.topic == topic)
+                                                .cloned()
+                                                .collect_vec()
+                                        };
+                                        let mut articles = articles.into_iter();
+                                        let all = articles
+                                            .clone()
                                             .map(|article| {
                                                 view! { <ArticlePreview article=article/> }
                                             })
-                                    };
-                                    match topic {
-                                        LATEST => {
-                                            view! {
-                                                <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
-                                                    <div class="col-span-2">{next()}</div>
-                                                    <div class="flex flex-col row-span-3 gap-2">
-                                                        {next()} {next()} {next()}
+                                            .collect_vec();
+                                        let mut next = || {
+                                            articles
+                                                .next()
+                                                .map(|article| {
+                                                    view! { <ArticlePreview article=article/> }
+                                                })
+                                        };
+                                        match topic {
+                                            LATEST => {
+                                                view! {
+                                                    <div class="flex flex-col gap-2 md:hidden">{all}</div>
+                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
+                                                        <div class="col-span-2">{next()}</div>
+                                                        <div class="flex flex-col row-span-3 gap-2">
+                                                            {next()} {next()} {next()}
+                                                        </div>
+                                                        <div>{next()}</div>
+                                                        <div>{next()}</div>
+                                                        <div class="col-span-2">{next()}</div>
                                                     </div>
-                                                    <div>{next()}</div>
-                                                    <div>{next()}</div>
-                                                    <div class="col-span-2">{next()}</div>
-                                                </div>
+                                                }
+                                            }
+                                            ARCHIVE => {
+                                                view! {
+                                                    <>
+                                                        <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
+                                                            {all}
+                                                        </div>
+                                                    </>
+                                                }
+                                            }
+                                            _ => {
+                                                view! {
+                                                    <div class="flex flex-col gap-2 md:hidden">{all}</div>
+                                                    <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
+                                                        <div class="col-span-2 row-span-2">{next()}</div>
+                                                        <div>{next()}</div>
+                                                        <div>{next()}</div>
+                                                        <div>{next()}</div>
+                                                        <div>{next()}</div>
+                                                    </div>
+                                                }
                                             }
                                         }
-                                        ARCHIVE => {
-                                            view! {
-                                                <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
-                                                    {from_fn(next).collect_view()}
-                                                </div>
-                                            }
-                                        }
-                                        _ => {
-                                            view! {
-                                                <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
-                                                    <div class="col-span-2 row-span-2">{next()}</div>
-                                                    <div>{next()}</div>
-                                                    <div>{next()}</div>
-                                                    <div>{next()}</div>
-                                                    <div>{next()}</div>
-                                                </div>
-                                            }
-                                        }
-                                    }
-                                }}
-                            }
-                        })
-                        .collect_view()
-                }}
+                                    }}
+                                }
+                            })
+                            .collect_view()
+                    }}
 
+                </div>
             </div>
         </div>
     }
@@ -263,65 +270,67 @@ pub fn Article() -> impl IntoView {
     };
     view! {
         <Meta name="description" content=article().blurb/>
-        <div class="flex flex-col gap-4">
-            <div>
-                <Heading>{move || article().title.to_uppercase()}</Heading>
-                <Caption>
-                    <div class="text-left sm:text-lg">{move || article().blurb}</div>
-                </Caption>
-                <div class="flex gap-1 text-sm font-light">
-                    <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
-                    "\u{b7} "
-                    {move || article().reading_time()}
-                    " min read"
+        <div class="w-full max-w-2xl shrink-0">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <Heading>{move || article().title.to_uppercase()}</Heading>
+                    <Caption>
+                        <div class="text-left sm:text-lg">{move || article().blurb}</div>
+                    </Caption>
+                    <div class="flex gap-1 text-sm font-light">
+                        <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
+                        "\u{b7} "
+                        {move || article().reading_time()}
+                        " min read"
+                    </div>
                 </div>
-            </div>
-            <div class="sm:px-16">
-                <img
-                    src=move || article().image.url
-                    alt=move || article().image.caption
-                    class="object-cover w-full aspect-[3/2]"
-                />
-                <Caption>{move || article().image.caption}</Caption>
-            </div>
-            <Divider/>
-            <div class="flex flex-col gap-5 sm:text-lg
-            [&>div:first-child>p]:first-letter:text-[2.8rem]
-            sm:[&>div:first-child>p]:first-letter:text-[3.5rem]
-            [&>div:first-child>p]:first-letter:leading-none
-            [&>div:first-child>p]:first-letter:font-bold
-            [&>div:first-child>p]:first-letter:font-serif
-            [&>div:first-child>p]:first-letter:float-left
-            [&>div:first-child>p]:first-letter:pr-2">
-                {move || {
-                    article()
-                        .fragments
-                        .iter()
-                        .map(|fragment| {
-                            match fragment {
-                                Fragment::Image(Image { url, caption }) => {
-                                    view! {
-                                        <div class="px-16">
-                                            <img src=*url alt=*caption class="object-cover w-full"/>
-                                            <Caption>{*caption}</Caption>
-                                        </div>
+                <div class="sm:px-16">
+                    <img
+                        src=move || article().image.url
+                        alt=move || article().image.caption
+                        class="object-cover w-full aspect-[3/2]"
+                    />
+                    <Caption>{move || article().image.caption}</Caption>
+                </div>
+                <Divider/>
+                <div class="flex flex-col gap-5 sm:text-lg
+                [&>div:first-child>p]:first-letter:text-[2.8rem]
+                sm:[&>div:first-child>p]:first-letter:text-[3.5rem]
+                [&>div:first-child>p]:first-letter:leading-none
+                [&>div:first-child>p]:first-letter:font-bold
+                [&>div:first-child>p]:first-letter:font-serif
+                [&>div:first-child>p]:first-letter:float-left
+                [&>div:first-child>p]:first-letter:pr-2">
+                    {move || {
+                        article()
+                            .fragments
+                            .iter()
+                            .map(|fragment| {
+                                match fragment {
+                                    Fragment::Image(Image { url, caption }) => {
+                                        view! {
+                                            <div class="px-16">
+                                                <img src=*url alt=*caption class="object-cover w-full"/>
+                                                <Caption>{*caption}</Caption>
+                                            </div>
+                                        }
+                                    }
+                                    Fragment::Text(text) => {
+                                        view! {
+                                            <div>
+                                                <p>{*text}</p>
+                                            </div>
+                                        }
                                     }
                                 }
-                                Fragment::Text(text) => {
-                                    view! {
-                                        <div>
-                                            <p>{*text}</p>
-                                        </div>
-                                    }
-                                }
-                            }
-                        })
-                        .collect_view()
-                }}
+                            })
+                            .collect_view()
+                    }}
 
+                </div>
+                <Divider/>
+                <ReadMore this_article=article/>
             </div>
-            <Divider/>
-            <ReadMore this_article=article/>
         </div>
     }
 }
@@ -738,66 +747,70 @@ pub fn Crossword() -> impl IntoView {
         button.set_text_content(Some(format!("{:?}", correct()).as_str()));
     };
     view! {
-        <div class="flex flex-col gap-2">
-
-            {move || {
-                view! {
-                    <CrosswordGrid
-                        grid=grid()
-                        crossword=crossword()
-                        on_solution_change=set_solution
-                    />
-                }
-            }}
-            <div class="flex justify-center">
-                <button
-                    class="px-4 py-2 text-white bg-black rounded disabled:opacity-50 disabled:pointer-events-none"
-                    disabled=move || {
-                        solution().is_empty()
-                            || solution().iter().any(|(_, letter)| letter.is_none())
-                    }
-
-                    on:click=check
-                >
-
-                    "Check"
-                </button>
-            </div>
-            <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
+        <div class="flex flex-col gap-4 md:flex-row">
+            <div class="flex flex-col gap-2 basis-0 grow">
                 {move || {
-                    Direction::ALL
-                        .iter()
-                        .map(|direction| {
-                            view! {
-                                <div class="flex flex-col">
-                                    <h1 class="text-2xl font-semibold">{direction.to_string()}</h1>
-                                    <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2">
-                                        {crossword()
-                                            .words
-                                            .iter()
-                                            .filter(|word| word.direction == *direction)
-                                            .sorted_unstable_by_key(|word| {
-                                                starts().iter().position(|start| *start == word.position)
-                                            })
-                                            .map(|word| {
-                                                view! {
-                                                    <div class="font-semibold">
-                                                        {starts()
-                                                            .iter()
-                                                            .position(|start| *start == word.position)
-                                                            .map(|index| index + 1)}
-                                                    </div>
-                                                    <div>{word.clue}</div>
-                                                }
-                                            })
-                                            .collect_view()}
-                                    </div>
-                                </div>
-                            }
-                        })
-                        .collect_view()
+                    view! {
+                        <CrosswordGrid
+                            grid=grid()
+                            crossword=crossword()
+                            on_solution_change=set_solution
+                        />
+                    }
                 }}
+                <div class="flex justify-center">
+                    <button
+                        class="px-4 py-2 text-white bg-black rounded disabled:hidden"
+                        disabled=move || {
+                            solution().is_empty()
+                                || solution().iter().any(|(_, letter)| letter.is_none())
+                        }
 
+                        on:click=check
+                    >
+                        "Check"
+                    </button>
+                </div>
+            </div>
+            <div class="flex justify-center basis-0 grow">
+                <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
+                    {move || {
+                        Direction::ALL
+                            .iter()
+                            .map(|direction| {
+                                view! {
+                                    <div class="flex flex-col">
+                                        <h1 class="text-2xl font-semibold">
+                                            {direction.to_string()}
+                                        </h1>
+                                        <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2">
+                                            {crossword()
+                                                .words
+                                                .iter()
+                                                .filter(|word| word.direction == *direction)
+                                                .sorted_unstable_by_key(|word| {
+                                                    starts().iter().position(|start| *start == word.position)
+                                                })
+                                                .map(|word| {
+                                                    view! {
+                                                        <div class="font-semibold">
+                                                            {starts()
+                                                                .iter()
+                                                                .position(|start| *start == word.position)
+                                                                .map(|index| index + 1)}
+                                                        </div>
+                                                        <div>{word.clue}</div>
+                                                    }
+                                                })
+                                                .collect_view()}
+                                        </div>
+                                    </div>
+                                }
+                            })
+                            .collect_view()
+                    }}
+
+                </div>
             </div>
         </div>
     }
