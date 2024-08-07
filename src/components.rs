@@ -92,7 +92,7 @@ pub fn ArticlePreviews() -> impl IntoView {
             name="description"
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
-        <div class="w-full max-w-4xl shrink-0">
+        <div class="w-full max-w-6xl shrink-0">
             <div class="flex flex-col gap-2">
                 <div class="hidden md:flex *:px-2 divide-x font-serif justify-center">
 
@@ -166,9 +166,9 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] gap-4 hidden md:grid">
+                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] divide-x gap-4 hidden md:grid">
                                                         <div class="col-span-2">{next()}</div>
-                                                        <div class="flex flex-col row-span-3 gap-2">
+                                                        <div class="flex flex-col row-span-3 gap-2 pl-4">
                                                             {next()} {next()} {next()}
                                                         </div>
                                                         <div>{next()}</div>
