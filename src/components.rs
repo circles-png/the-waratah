@@ -144,21 +144,14 @@ pub fn ArticlePreviews() -> impl IntoView {
                                 <Heading>{topic}</Heading>
                                 <Divider/>
                                 {move || {
-                                    #[allow(clippy::cast_sign_loss)]
-                                    let mut rng = StdRng::seed_from_u64(
-                                        (Local::now().date_naive() - NaiveDate::MIN).num_days()
-                                            as u64,
-                                    );
                                     let articles = if matches!(topic, LATEST | ARCHIVE) {
                                         ARTICLES.iter().cloned().collect_vec()
                                     } else {
-                                        let mut articles = ARTICLES
+                                        ARTICLES
                                             .iter()
                                             .filter(|article| article.topic == topic)
                                             .cloned()
-                                            .collect_vec();
-                                        articles.shuffle(&mut rng);
-                                        articles
+                                            .collect_vec()
                                     };
                                     let mut articles = articles.into_iter();
                                     let mut next = || {
