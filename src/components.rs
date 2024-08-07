@@ -328,11 +328,12 @@ pub fn ArticlePreview(
                     .then_some(
                         view! {
                             <Caption>
-                                <div class=if layout.size == ArticleSize::Hero {
-                                    "text-base text-left"
-                                } else {
-                                    "text-sm text-left"
-                                }>{article.blurb}</div>
+                                <div class=format!(
+                                    "text-left {}",
+                                    (layout.size != ArticleSize::Hero)
+                                        .then_some("text-sm")
+                                        .unwrap_or_default(),
+                                )>{article.blurb}</div>
                             </Caption>
                         },
                     )}
