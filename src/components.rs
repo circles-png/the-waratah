@@ -70,7 +70,7 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="text-5xl capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="text-6xl capitalize font-blackletter">"The Yesterday"</div>
                     <div class="block font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </a>
