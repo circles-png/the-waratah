@@ -178,16 +178,16 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="grid-cols-[repeat(3,auto)] grid-rows-[repeat(3,auto)] *:px-4 divide-x hidden md:grid">
-                                                        <div class="col-span-2">{next!(hero)}</div>
-                                                        <div class="flex flex-col row-span-3 *:py-2 divide-y divide-gray-300">
+                                                    <div class="flex divide-x divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                        <div class="flex flex-col w-2/3 gap-4">
+                                                            {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
+                                                                <div>{next!()}</div>
+                                                                <div>{next!()}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
                                                             {from_fn(|| next!(no_image)).take(4).collect_view()}
                                                         </div>
-                                                        <div class="flex col-span-2 gap-4 *:basis-0 *:grow">
-                                                            <div>{next!()}</div>
-                                                            <div>{next!()}</div>
-                                                        </div>
-                                                        <div class="col-span-2">{next!()}</div>
                                                     </div>
                                                 }
                                             }
