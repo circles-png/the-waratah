@@ -106,8 +106,8 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="text-6xl capitalize font-blackletter">"The Yesterday"</div>
-                    <div class="block font-serif text-base">"Trusted by dozens."</div>
+                    <div class="text-6xl capitalize pt-2 font-blackletter">"The Yesterday"</div>
+                    <div class="block font-serif text-base pb-2">"Trusted by dozens."</div>
                 </Heading>
             </a>
         </header>
@@ -132,7 +132,7 @@ pub fn ArticlePreviews() -> impl IntoView {
         <div class="w-full max-w-6xl shrink-0">
             <div class="flex flex-col gap-2">
                 <div class="flex justify-center">
-                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-b border-black pb-2">
+                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-b border-t border-black pt-2 pb-2">
                         {move || {
                             ARTICLES
                                 .iter()
@@ -175,7 +175,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                         .then_some(
                                             view! {
                                                 <Divider />
-                                                <Heading>{topic}</Heading>
+                                                <CategoryHeading>{topic}</CategoryHeading>
                                             },
                                         )}
                                     {move || {
@@ -367,7 +367,7 @@ pub fn ArticlePreview(
                         view! {
                             <Caption>
                                 <div class=format!(
-                                    "text-left {}",
+                                    "text-left font-serif {}",
                                     (layout.size == ArticleSize::Hero)
                                         .then_some("text-lg")
                                         .unwrap_or_default(),
@@ -402,7 +402,7 @@ pub fn Article() -> impl IntoView {
                 <div>
                     <Heading>{move || article().title.to_uppercase()}</Heading>
                     <Caption>
-                        <div class="text-left text-base sm:text-lg">{move || article().blurb}</div>
+                        <div class="text-left font-serif text-base sm:text-lg">{move || article().blurb}</div>
                     </Caption>
                     <div class="flex gap-1 text-base font-light">
                         <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
@@ -420,7 +420,7 @@ pub fn Article() -> impl IntoView {
                     <Caption>{move || article().image.caption}</Caption>
                 </div>
                 <Divider />
-                <div class="flex flex-col gap-5 text-lg/[1.75rem] sm:text-xl/[2rem]
+                <div class="flex flex-col gap-5 font-serif text-lg/[1.75rem] sm:text-xl/[2rem]
                 [&>div:first-child>p]:first-letter:text-[3.45rem]
                 sm:[&>div:first-child>p]:first-letter:text-[3.9rem]
                 [&>div:first-child>p]:first-letter:leading-none
@@ -516,6 +516,11 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
     view! { <h1 class="font-serif text-3xl font-medium capitalize sm:text-4xl">{children()}</h1> }
+}
+
+#[component]
+pub fn CategoryHeading(children: Children) -> impl IntoView {
+    view! { <h1 class="text-lg font-black capitalize sm:text-lg">{children()}</h1> }
 }
 
 #[component]
