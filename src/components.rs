@@ -215,7 +215,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="flex divide-x divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                    <div class="flex divide-x pt-2 pb-2 divide-gray-300 first:*:pr-4 last:*:pl-4">
                                                         <div class="flex flex-col w-2/3 gap-4">
                                                             {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
                                                                 <div>{next!()}</div>
