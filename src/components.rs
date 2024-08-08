@@ -402,9 +402,9 @@ pub fn Article() -> impl IntoView {
                 <div>
                     <Heading>{move || article().title.to_uppercase()}</Heading>
                     <Caption>
-                        <div class="text-left sm:text-lg">{move || article().blurb}</div>
+                        <div class="text-left text-base sm:text-lg">{move || article().blurb}</div>
                     </Caption>
-                    <div class="flex gap-1 text-sm font-light">
+                    <div class="flex gap-1 text-base font-light">
                         <div class="text-blue-800">{move || article().topic.to_uppercase()}</div>
                         "\u{b7} "
                         {move || article().reading_time()}
@@ -420,9 +420,9 @@ pub fn Article() -> impl IntoView {
                     <Caption>{move || article().image.caption}</Caption>
                 </div>
                 <Divider />
-                <div class="flex flex-col gap-5 sm:text-lg
-                [&>div:first-child>p]:first-letter:text-[2.8rem]
-                sm:[&>div:first-child>p]:first-letter:text-[3.5rem]
+                <div class="flex flex-col gap-5 text-lg/[1.75rem] sm:text-xl/[2rem]
+                [&>div:first-child>p]:first-letter:text-[3.45rem]
+                sm:[&>div:first-child>p]:first-letter:text-[3.9rem]
                 [&>div:first-child>p]:first-letter:leading-none
                 [&>div:first-child>p]:first-letter:font-bold
                 [&>div:first-child>p]:first-letter:font-serif
@@ -515,7 +515,7 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
 
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
-    view! { <h1 class="font-serif text-2xl font-medium uppercase sm:text-4xl">{children()}</h1> }
+    view! { <h1 class="font-serif text-3xl font-medium uppercase sm:text-4xl">{children()}</h1> }
 }
 
 #[component]

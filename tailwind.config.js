@@ -8,7 +8,7 @@ module.exports = {
     extend: {
       fontFamily: {
         'blackletter': ["Unifraktur Maguntia"],
-        'sans': ["PT Sans"],
+        'sans': ["PT Serif"],
         'serif': ["PT Serif"],
       }
     },
