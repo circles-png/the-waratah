@@ -515,7 +515,7 @@ pub fn ReadMore(this_article: impl Fn() -> &'static Article + 'static) -> impl I
 
 #[component]
 pub fn Heading(children: Children) -> impl IntoView {
-    view! { <h1 class="font-serif text-3xl font-medium uppercase sm:text-4xl">{children()}</h1> }
+    view! { <h1 class="font-serif text-3xl font-medium capitalize sm:text-4xl">{children()}</h1> }
 }
 
 #[component]
