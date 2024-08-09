@@ -132,7 +132,7 @@ pub fn ArticlePreviews() -> impl IntoView {
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
         <div class="flex flex-col items-center w-full gap-2">
-            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow z-50">
+            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow">
                 <div class="hidden md:flex *:px-3 divide-x font-noto justify-center py-2">
                     {move || {
                         ARTICLES
@@ -235,7 +235,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 let main = articles.next().unwrap();
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="hidden gap-4 md:flex *:basis-0 *:grow">
+                                                    <div class="hidden gap-4 md:flex">
                                                         <div class="flex flex-col gap-4">
                                                             <ArticlePreview
                                                                 article=main.clone()
@@ -249,7 +249,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                             <img
                                                                 src=main.image.url
                                                                 alt=main.image.caption
-                                                                class="object-cover grow"
+                                                                class="object-cover aspect-[3/2] h-full"
                                                             />
                                                         </div>
                                                         <div>{next!()}</div>
