@@ -116,7 +116,7 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    view! { <main class="flex justify-center gap-4 p-4 grow">{children()}</main> }
+    view! { <main class="flex justify-center gap-4 grow [&_*]:[font-synthesis:none]">{children()}</main> }
 }
 
 #[component]
@@ -129,34 +129,34 @@ pub fn ArticlePreviews() -> impl IntoView {
             name="description"
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
-        <div class="w-full max-w-6xl shrink-0">
-            <div class="flex flex-col gap-2">
-                <div class="flex justify-center">
-                    <div class="hidden md:flex *:px-3 divide-x font-noto justify-center border-y border-black py-2">
-                        {move || {
-                            ARTICLES
-                                .iter()
-                                .map(|article| article.topic)
-                                .chain(once(ARCHIVE))
-                                .unique()
-                                .map(|topic| {
-                                    view! {
-                                        <button
-                                            class=filter
-                                                .get()
-                                                .as_ref()
-                                                .map_or(false, |filter| topic == *filter)
-                                                .then_some("text-blue-800")
-                                            on:click=move |_| set_filter(Some(topic))
-                                        >
-                                            {topic}
-                                        </button>
-                                    }
-                                })
-                                .collect_view()
-                        }}
-                    </div>
+        <div class="flex flex-col items-center w-full gap-2">
+            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow">
+                <div class="hidden md:flex *:px-3 divide-x font-noto justify-center py-2">
+                    {move || {
+                        ARTICLES
+                            .iter()
+                            .map(|article| article.topic)
+                            .chain(once(ARCHIVE))
+                            .unique()
+                            .map(|topic| {
+                                view! {
+                                    <button
+                                        class=filter
+                                            .get()
+                                            .as_ref()
+                                            .map_or(false, |filter| topic == *filter)
+                                            .then_some("text-blue-800")
+                                        on:click=move |_| set_filter(Some(topic))
+                                    >
+                                        {topic}
+                                    </button>
+                                }
+                            })
+                            .collect_view()
+                    }}
                 </div>
+            </div>
+            <div class="w-full max-w-6xl pb-4 shrink-0">
                 <div class="flex flex-col gap-2">
                     {move || {
                         const LATEST: &str = "Latest";
@@ -215,14 +215,14 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="flex divide-x py-2 divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                    <div class="flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
                                                         <div class="flex flex-col w-2/3 gap-4">
                                                             {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
                                                                 <div>{next!()}</div>
                                                                 <div>{next!()}</div>
                                                             </div>
                                                         </div>
-                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-2 last:*:pb-2 w-1/3">
+                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
                                                             {next!()}
                                                             {from_fn(|| next!(no_image)).take(3).collect_view()}
                                                         </div>
@@ -256,7 +256,6 @@ pub fn ArticlePreviews() -> impl IntoView {
                             })
                             .collect_view()
                     }}
-
                 </div>
             </div>
         </div>
@@ -397,7 +396,7 @@ pub fn Article() -> impl IntoView {
     };
     view! {
         <Meta name="description" content=article().blurb />
-        <div class="w-full max-w-2xl shrink-0">
+        <div class="w-full max-w-2xl py-4 shrink-0">
             <div class="flex flex-col gap-4">
                 <div>
                     <Heading>{move || article().title.to_uppercase()}</Heading>
