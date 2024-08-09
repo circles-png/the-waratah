@@ -522,7 +522,7 @@ pub fn Heading(children: Children) -> impl IntoView {
 
 #[component]
 pub fn CategoryHeading(children: Children) -> impl IntoView {
-    view! { <h1 class="text-lg font-black capitalize sm:text-lg">{children()}</h1> }
+    view! { <h1 class="text-lg font-bold font-noto capitalize sm:text-lg">{children()}</h1> }
 }
 
 #[component]
