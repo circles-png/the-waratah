@@ -2,7 +2,7 @@ use crate::crossword::{Crossword, Direction, Vec2};
 use itertools::Itertools;
 use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
-use leptos::web_sys::HtmlButtonElement;
+use leptos::web_sys::{HtmlButtonElement, HtmlInputElement};
 use leptos_meta::{provide_meta_context, Meta};
 use std::collections::HashMap;
 use std::iter::from_fn;
@@ -802,8 +802,8 @@ pub fn CrosswordGrid(
     view! {
         <div class="flex justify-center">
             <div
-                class="grid"
-                style=format!("grid-template-columns: repeat({}, minmax(0, 1fr));", size.x)
+                class="grid overflow-x-auto"
+                style=format!("grid-template-columns: repeat({}, auto);", size.x)
             >
                 {grid
                     .into_iter()
@@ -830,19 +830,19 @@ pub fn CrosswordGrid(
                                                 .unwrap_or_default(),
                                         )
                                     }>
-                                        <button
-                                            class="size-full focus:outline-none"
-                                            on:click=move |_| match selected.get() {
-                                                Some(selected) if selected == index => set_selected(None),
-                                                _ => set_selected(Some(index)),
+                                        <input
+                                            class="text-center bg-transparent size-full focus:outline-none caret-transparent"
+                                            on:focus=move |_| {
+                                                match selected.get() {
+                                                    Some(selected) if selected == index => set_selected(None),
+                                                    _ => set_selected(Some(index)),
+                                                }
                                             }
-                                        >
-
-                                            {move || {
+                                            value=move || {
                                                 solution.get().get(&index).unwrap().unwrap_or_default()
-                                            }}
+                                            }
+                                        />
 
-                                        </button>
                                         <div class="absolute text-[8px] leading-none opacity-50 inset-0.5 pointer-events-none">
                                             {word_start.map(|index| index + 1)}
                                         </div>
