@@ -800,7 +800,7 @@ pub fn CrosswordGrid(
         window_event_listener(keydown, handler);
     }
     view! {
-        <div class="flex justify-center w-full overflow-x-auto">
+        <div class="flex justify-center w-full p-2 overflow-x-auto">
             <div
                 class="grid"
                 style=format!("grid-template-columns: repeat({}, auto);", size.x)
