@@ -198,25 +198,11 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             })
                                             .collect_vec();
                                         macro_rules! next {
-                                            () => {
-                                                articles.next().map(| article | { view! { < ArticlePreview
-                                                article = article /> } })
-                                            };
-                                            (hero) => {
+                                            ($($mod:ident)*) => {
                                                 articles.next().map(| article | { view! { < ArticlePreview
                                                 article = article layout = ArticlePreviewLayout::default()
-                                                .hero() /> } })
+                                                $(.$mod ())* /> } })
                                             };
-                                            (no_image) => {
-                                                articles.next().map(| article | { view! { < ArticlePreview
-                                                article = article layout = ArticlePreviewLayout::default()
-                                                .without_image() /> } })
-                                            };
-                                            (no_category) => {
-                                                articles.next().map(| article | { view! { < ArticlePreview
-                                                article = article layout = ArticlePreviewLayout::default()
-                                                .without_category() /> } })
-                                            }
                                         }
                                         match topic {
                                             LATEST => {
@@ -231,7 +217,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                         </div>
                                                         <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
                                                             {next!()}
-                                                            {from_fn(|| next!(no_image)).take(3).collect_view()}
+                                                            {from_fn(|| next!(without_image)).take(3).collect_view()}
                                                         </div>
                                                     </div>
                                                 }
@@ -246,14 +232,27 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 }
                                             }
                                             _ => {
+                                                let main = articles.next().unwrap();
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
-                                                        <div class="col-span-2 row-span-2">{next!(no_category)}</div>
-                                                        <div>{next!(no_category)}</div>
-                                                        <div>{next!(no_category)}</div>
-                                                        <div>{next!(no_category)}</div>
-                                                        <div>{next!(no_category)}</div>
+                                                    <div class="hidden gap-4 md:flex *:basis-0 *:grow">
+                                                        <div class="flex flex-col gap-4">
+                                                            <ArticlePreview
+                                                                article=main.clone()
+                                                                layout=ArticlePreviewLayout::default()
+                                                                    .without_image()
+                                                                    .without_category()
+                                                            />
+                                                            {next!(without_image without_category)}
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <img
+                                                                src=main.image.url
+                                                                alt=main.image.caption
+                                                                class="object-cover grow"
+                                                            />
+                                                        </div>
+                                                        <div>{next!()}</div>
                                                     </div>
                                                 }
                                             }
@@ -375,8 +374,7 @@ pub fn ArticlePreview(
                                 {article.topic.to_uppercase()}
                             </div>
                         },
-                    )}
-                <Heading>
+                    )} <Heading>
                     <article class=if layout.size == ArticleSize::Hero {
                         "text-3xl"
                     } else {
