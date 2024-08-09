@@ -106,8 +106,8 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="text-6xl capitalize pt-2 font-blackletter">"The Yesterday"</div>
-                    <div class="block font-serif text-base pb-2">"Trusted by dozens."</div>
+                    <div class="pt-2 text-6xl capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="block pb-2 font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </a>
         </header>
@@ -132,7 +132,7 @@ pub fn ArticlePreviews() -> impl IntoView {
         <div class="w-full max-w-6xl shrink-0">
             <div class="flex flex-col gap-2">
                 <div class="flex justify-center">
-                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-b border-t border-black pt-2 pb-2">
+                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-y border-black pt-2 pb-2">
                         {move || {
                             ARTICLES
                                 .iter()
@@ -215,7 +215,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="flex divide-x pt-2 pb-2 divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                    <div class="flex divide-x py-2 divide-gray-300 first:*:pr-4 last:*:pl-4">
                                                         <div class="flex flex-col w-2/3 gap-4">
                                                             {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
                                                                 <div>{next!()}</div>
@@ -402,7 +402,7 @@ pub fn Article() -> impl IntoView {
                 <div>
                     <Heading>{move || article().title.to_uppercase()}</Heading>
                     <Caption>
-                        <div class="text-left font-serif text-base sm:text-lg">
+                        <div class="font-serif text-base text-left sm:text-lg">
                             {move || article().blurb}
                         </div>
                     </Caption>
@@ -522,7 +522,7 @@ pub fn Heading(children: Children) -> impl IntoView {
 
 #[component]
 pub fn CategoryHeading(children: Children) -> impl IntoView {
-    view! { <h1 class="text-lg font-bold font-noto capitalize sm:text-lg">{children()}</h1> }
+    view! { <h1 class="text-lg font-bold capitalize font-noto sm:text-lg">{children()}</h1> }
 }
 
 #[component]
