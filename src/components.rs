@@ -116,7 +116,9 @@ pub fn Header() -> impl IntoView {
 
 #[component]
 pub fn PageContainer(children: Children) -> impl IntoView {
-    view! { <main class="flex justify-center gap-4 grow [&_*]:[font-synthesis:none]">{children()}</main> }
+    view! {
+        <main class="flex justify-center gap-4 grow [&_*]:[font-synthesis:none]">{children()}</main>
+    }
 }
 
 #[component]
@@ -210,6 +212,11 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 article = article layout = ArticlePreviewLayout::default()
                                                 .without_image() /> } })
                                             };
+                                            (no_category) => {
+                                                articles.next().map(| article | { view! { < ArticlePreview
+                                                article = article layout = ArticlePreviewLayout::default()
+                                                .without_category() /> } })
+                                            }
                                         }
                                         match topic {
                                             LATEST => {
@@ -242,11 +249,11 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
                                                     <div class="grid-cols-[repeat(4,auto)] grid-rows-[repeat(2,auto)] gap-4 hidden md:grid">
-                                                        <div class="col-span-2 row-span-2">{next!()}</div>
-                                                        <div>{next!()}</div>
-                                                        <div>{next!()}</div>
-                                                        <div>{next!()}</div>
-                                                        <div>{next!()}</div>
+                                                        <div class="col-span-2 row-span-2">{next!(no_category)}</div>
+                                                        <div>{next!(no_category)}</div>
+                                                        <div>{next!(no_category)}</div>
+                                                        <div>{next!(no_category)}</div>
+                                                        <div>{next!(no_category)}</div>
                                                     </div>
                                                 }
                                             }
@@ -266,6 +273,7 @@ pub fn ArticlePreviews() -> impl IntoView {
 pub struct ArticlePreviewLayout {
     blurb: bool,
     image: bool,
+    category: bool,
     direction: ArticleDirection,
     size: ArticleSize,
 }
@@ -307,6 +315,12 @@ impl ArticlePreviewLayout {
             ..self
         }
     }
+    const fn without_category(self) -> Self {
+        Self {
+            category: false,
+            ..self
+        }
+    }
 }
 
 impl Default for ArticlePreviewLayout {
@@ -314,6 +328,7 @@ impl Default for ArticlePreviewLayout {
         Self {
             blurb: true,
             image: true,
+            category: true,
             direction: ArticleDirection::Vertical,
             size: ArticleSize::Normal,
         }
@@ -352,7 +367,15 @@ pub fn ArticlePreview(
                     },
                 )}
             <div>
-                <div class="font-light text-blue-800">{article.topic.to_uppercase()}</div>
+                {layout
+                    .category
+                    .then_some(
+                        view! {
+                            <div class="font-light text-blue-800">
+                                {article.topic.to_uppercase()}
+                            </div>
+                        },
+                    )}
                 <Heading>
                     <article class=if layout.size == ArticleSize::Hero {
                         "text-3xl"
