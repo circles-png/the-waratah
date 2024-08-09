@@ -132,7 +132,7 @@ pub fn ArticlePreviews() -> impl IntoView {
         <div class="w-full max-w-6xl shrink-0">
             <div class="flex flex-col gap-2">
                 <div class="flex justify-center">
-                    <div class="hidden md:flex *:px-2 divide-x font-serif justify-center border-b border-t border-black pt-2 pb-2">
+                    <div class="hidden md:flex *:px-3 divide-x font-noto justify-center border-b border-t border-black pt-2 pb-2">
                         {move || {
                             ARTICLES
                                 .iter()
@@ -356,9 +356,9 @@ pub fn ArticlePreview(
                 <div class="font-light text-blue-800">{article.topic.to_uppercase()}</div>
                 <Heading>
                     <article class=if layout.size == ArticleSize::Hero {
-                        "text-4xl"
+                        "text-3xl"
                     } else {
-                        "text-2xl"
+                        "text-xl"
                     }>{article.title}</article>
                 </Heading>
                 {layout
