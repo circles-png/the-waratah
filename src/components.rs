@@ -132,7 +132,7 @@ pub fn ArticlePreviews() -> impl IntoView {
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
         <div class="flex flex-col items-center w-full gap-2">
-            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow">
+            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow z-50">
                 <div class="hidden md:flex *:px-3 divide-x font-noto justify-center py-2">
                     {move || {
                         ARTICLES
