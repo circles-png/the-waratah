@@ -417,7 +417,7 @@ pub fn Article() -> impl IntoView {
     };
     view! {
         <Meta name="description" content=article().blurb />
-        <div class="w-full max-w-2xl py-4 shrink-0">
+        <div class="w-full max-w-2xl p-4 shrink-0">
             <div class="flex flex-col gap-4">
                 <div>
                     <Heading>{move || article().title.to_uppercase()}</Heading>
@@ -800,9 +800,9 @@ pub fn CrosswordGrid(
         window_event_listener(keydown, handler);
     }
     view! {
-        <div class="flex justify-center">
+        <div class="flex justify-center w-full overflow-x-auto">
             <div
-                class="grid overflow-x-auto"
+                class="grid"
                 style=format!("grid-template-columns: repeat({}, auto);", size.x)
             >
                 {grid
@@ -842,7 +842,6 @@ pub fn CrosswordGrid(
                                                 solution.get().get(&index).unwrap().unwrap_or_default()
                                             }
                                         />
-
                                         <div class="absolute text-[8px] leading-none opacity-50 inset-0.5 pointer-events-none">
                                             {word_start.map(|index| index + 1)}
                                         </div>
@@ -912,8 +911,8 @@ pub fn Crossword() -> impl IntoView {
         button.set_text_content(Some(format!("{:?}", correct()).as_str()));
     };
     view! {
-        <div class="flex flex-col gap-4 p-4 md:flex-row">
-            <div class="flex flex-col gap-2 basis-0 grow">
+        <div class="flex flex-col w-full gap-4 p-4 lg:flex-row">
+            <div class="flex flex-col gap-2 lg:basis-0 lg:grow">
                 {move || {
                     view! {
                         <CrosswordGrid
@@ -922,9 +921,9 @@ pub fn Crossword() -> impl IntoView {
                             on_solution_change=set_solution
                         />
                     }
-                }} <div class="flex justify-center">
+                }} <div class="flex justify-center has-[:disabled]:hidden">
                     <button
-                        class="px-4 py-2 text-white bg-black rounded disabled:hidden"
+                        class="px-4 py-2 text-white bg-black rounded"
                         disabled=move || {
                             solution().is_empty()
                                 || solution().iter().any(|(_, letter)| letter.is_none())
@@ -936,7 +935,7 @@ pub fn Crossword() -> impl IntoView {
                     </button>
                 </div>
             </div>
-            <div class="flex justify-center basis-0 grow">
+            <div class="flex justify-center lg:basis-0 lg:grow">
                 <div class="flex flex-col grid-cols-2 gap-2 sm:grid">
                     {move || {
                         Direction::ALL
