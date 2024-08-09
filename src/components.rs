@@ -131,9 +131,9 @@ pub fn ArticlePreviews() -> impl IntoView {
             name="description"
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
-        <div class="flex flex-col items-center w-full gap-2">
-            <div class="sticky top-0 flex justify-center w-full p-2 bg-white shadow">
-                <div class="hidden md:flex *:px-3 divide-x font-noto justify-center py-2">
+        <div class="flex flex-col items-center w-full gap-2 p-4 md:p-0">
+            <div class="sticky top-0 justify-center hidden w-full p-2 bg-white shadow md:flex">
+                <div class="flex *:px-3 divide-x font-noto justify-center py-2">
                     {move || {
                         ARTICLES
                             .iter()
@@ -208,7 +208,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             LATEST => {
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                    <div class="hidden md:flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
                                                         <div class="flex flex-col w-2/3 gap-4">
                                                             {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
                                                                 <div>{next!()}</div>
@@ -912,7 +912,7 @@ pub fn Crossword() -> impl IntoView {
         button.set_text_content(Some(format!("{:?}", correct()).as_str()));
     };
     view! {
-        <div class="flex flex-col gap-4 md:flex-row">
+        <div class="flex flex-col gap-4 p-4 md:flex-row">
             <div class="flex flex-col gap-2 basis-0 grow">
                 {move || {
                     view! {
