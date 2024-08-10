@@ -235,24 +235,26 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 let main = articles.next().unwrap();
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="hidden grid-cols-12 gap-4 md:grid">
-                                                        <div class="flex flex-col col-span-3 gap-4">
-                                                            <ArticlePreview
-                                                                article=main.clone()
-                                                                layout=ArticlePreviewLayout::default()
-                                                                    .without_image()
-                                                                    .without_category()
-                                                            />
-                                                            {next!(without_image without_category)}
+                                                    <div class="hidden grid-cols-3 first:*:pr-2 last:*:pl-2 md:grid divide-x divide-gray-300">
+                                                        <div class="grid grid-cols-8 col-span-2">
+                                                            <div class="flex flex-col col-span-3 gap-4">
+                                                                <ArticlePreview
+                                                                    article=main.clone()
+                                                                    layout=ArticlePreviewLayout::default()
+                                                                        .without_image()
+                                                                        .without_category()
+                                                                />
+                                                                {next!(without_image without_category)}
+                                                            </div>
+                                                            <div class="flex flex-col col-span-5">
+                                                                <img
+                                                                    src=main.image.url
+                                                                    alt=main.image.caption
+                                                                    class="object-cover aspect-[3/2]"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                        <div class="flex flex-col col-span-5">
-                                                            <img
-                                                                src=main.image.url
-                                                                alt=main.image.caption
-                                                                class="object-cover h-full"
-                                                            />
-                                                        </div>
-                                                        <div class="col-span-4">{next!()}</div>
+                                                        <div>{next!()}</div>
                                                     </div>
                                                 }
                                             }
