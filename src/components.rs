@@ -235,8 +235,8 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 let main = articles.next().unwrap();
                                                 view! {
                                                     <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="hidden grid-cols-3 first:*:pr-2 last:*:pl-2 md:grid divide-x divide-gray-300">
-                                                        <div class="grid grid-cols-8 col-span-2">
+                                                    <div class="hidden grid-cols-3 first:*:pr-4 last:*:pl-4 md:grid divide-x divide-gray-300">
+                                                        <div class="grid grid-cols-8 col-span-2 gap-4">
                                                             <div class="flex flex-col col-span-3 gap-4">
                                                                 <ArticlePreview
                                                                     article=main.clone()
