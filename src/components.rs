@@ -166,14 +166,13 @@ pub fn ArticlePreviews() -> impl IntoView {
                             .chain(ARTICLES.iter().map(|article| article.topic).unique())
                             .chain(once(ARCHIVE))
                             .filter(|topic| {
-                                filter
-                                    .get()
+                                filter()
                                     .as_ref()
                                     .map_or(*topic != ARCHIVE, |filter| topic == filter)
                             })
                             .map(|topic| {
                                 view! {
-                                    {(topic != LATEST)
+                                    {(topic != LATEST && filter().is_none())
                                         .then_some(
                                             view! {
                                                 <Divider />
@@ -204,23 +203,29 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 $(.$mod ())* /> } })
                                             };
                                         }
-                                        match topic {
-                                            LATEST => {
-                                                view! {
-                                                    <div class="flex flex-col gap-2 md:hidden">{all}</div>
-                                                    <div class="hidden md:flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
-                                                        <div class="flex flex-col w-2/3 gap-4">
-                                                            {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
-                                                                <div>{next!()}</div>
-                                                                <div>{next!()}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
-                                                            {next!()}
-                                                            {from_fn(|| next!(without_image)).take(3).collect_view()}
+                                        let mut hero = || {
+                                            view! {
+                                                <div class="flex flex-col gap-2 md:hidden">{all.clone()}</div>
+                                                <div class="hidden md:flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
+                                                    <div class="flex flex-col w-2/3 gap-4">
+                                                        {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
+                                                            <div>{next!()}</div>
+                                                            <div>{next!()}</div>
                                                         </div>
                                                     </div>
-                                                }
+                                                    <div class="flex flex-col divide-y divide-gray-300 *:py-4 first:*:pt-0 last:*:pb-0 w-1/3">
+                                                        {next!()}
+                                                        {from_fn(|| next!(without_image)).take(3).collect_view()}
+                                                    </div>
+                                                </div>
+                                            }
+                                        };
+                                        if filter().is_some() {
+                                            return hero();
+                                        }
+                                        match topic {
+                                            LATEST => {
+                                                hero()
                                             }
                                             ARCHIVE => {
                                                 view! {
