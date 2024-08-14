@@ -423,7 +423,7 @@ pub fn Article() -> impl IntoView {
         })
     };
     view! {
-        <Meta name="description" content=article().blurb />
+        <Meta name="description" content=move || article().blurb />
         <div class="w-full max-w-2xl p-4 shrink-0">
             <div class="flex flex-col gap-4">
                 <div>
