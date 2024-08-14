@@ -1,5 +1,3 @@
 # The Yesterday
 
-The online website of 'The Yesterday', the local newspaper of Buggarroo.
-
-Found at theyesterday.pages.dev
+The online website of [The Yesterda](theyesterday.pages.dev), the local newspaper of Buggarroo.
