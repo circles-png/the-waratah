@@ -106,7 +106,7 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="pt-2 text-6xl capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="pt-2 text-6xl capitalize font-blackletter">"The Warrah Recliner"</div>
                     <div class="block pb-2 font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </a>
@@ -560,7 +560,7 @@ pub fn Footer(#[prop(optional)] ads: bool) -> impl IntoView {
         <footer class="flex flex-col p-4 text-white bg-black">
             <A href="/">
                 <Heading>
-                    <div class="capitalize font-blackletter">"The Yesterday"</div>
+                    <div class="capitalize font-blackletter">"The Warrah Recliner"</div>
                 </Heading>
             </A>
             <div class="flex justify-between">
