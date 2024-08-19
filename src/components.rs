@@ -1,6 +1,6 @@
 use crate::crossword::{Crossword, Direction, Vec2};
 use itertools::Itertools;
-use leptos::ev::{keydown, KeyboardEvent, MouseEvent};
+use leptos::ev::{keydown, scroll, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
 use leptos::web_sys::HtmlButtonElement;
 use leptos_meta::{provide_meta_context, Meta};
@@ -17,8 +17,8 @@ use crate::crossword::CROSSWORDS;
 use chrono::Local;
 
 use leptos::{
-    component, create_memo, create_signal, event_target, view, window_event_listener, Callback,
-    Children, CollectView, IntoView, Params, SignalGet, SignalWith,
+    component, create_memo, create_signal, document, event_target, view, window_event_listener,
+    Callback, Children, CollectView, IntoView, Params, SignalGet, SignalWith,
 };
 use leptos_router::A;
 use leptos_router::{use_params, Route, Router, Routes};
@@ -106,7 +106,9 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="pt-2 text-6xl capitalize font-blackletter">"The Warrah Recliner"</div>
+                    <div class="pt-2 text-6xl capitalize font-blackletter">
+                        "The Warrah Recliner"
+                    </div>
                     <div class="block pb-2 font-serif text-base">"Trusted by dozens."</div>
                 </Heading>
             </a>
@@ -126,13 +128,20 @@ pub fn PageContainer(children: Children) -> impl IntoView {
 pub fn ArticlePreviews() -> impl IntoView {
     const ARCHIVE: &str = "Archive";
     let (filter, set_filter) = create_signal(None::<&str>);
+    let (stuck, set_stuck) = create_signal(false);
+    window_event_listener(scroll, move |_| {
+        set_stuck(document().scrolling_element().unwrap().scroll_top() > 0);
+    });
     view! {
         <Meta
             name="description"
             content="Australia's most serious newspaper, proudly brought to you by incredible (and a few credible) reporters."
         />
         <div class="flex flex-col items-center w-full gap-2 p-4 md:p-0">
-            <div class="sticky top-0 z-50 justify-center hidden w-full p-2 bg-white shadow md:flex">
+            <div
+                class="sticky top-0 z-50 justify-center hidden w-full p-2 transition bg-white md:flex"
+                class:shadow=stuck
+            >
                 <div class="flex *:px-3 divide-x font-noto justify-center py-2">
                     {move || {
                         ARTICLES
@@ -158,7 +167,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                     }}
                 </div>
             </div>
-            <div class="w-full max-w-6xl pb-4 shrink-0">
+            <div class="w-full max-w-6xl px-4 pb-4 shrink-0">
                 <div class="flex flex-col gap-2">
                     {move || {
                         const LATEST: &str = "Latest";
@@ -205,7 +214,9 @@ pub fn ArticlePreviews() -> impl IntoView {
                                         }
                                         let mut hero = || {
                                             view! {
-                                                <div class="flex flex-col gap-2 md:hidden">{all.clone()}</div>
+                                                <div class="flex flex-col gap-2 md:hidden">
+                                                    {all.clone()}
+                                                </div>
                                                 <div class="hidden md:flex divide-x py-4 divide-gray-300 first:*:pr-4 last:*:pl-4">
                                                     <div class="flex flex-col w-2/3 gap-4">
                                                         {next!(hero)} <div class="flex gap-4 *:basis-0 *:grow">
@@ -224,9 +235,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                             return hero();
                                         }
                                         match topic {
-                                            LATEST => {
-                                                hero()
-                                            }
+                                            LATEST => hero(),
                                             ARCHIVE => {
                                                 view! {
                                                     <>
