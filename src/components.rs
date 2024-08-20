@@ -231,7 +231,7 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                 </div>
                                             }
                                         };
-                                        if filter().is_some() {
+                                        if filter().is_some_and(|filter| filter != ARCHIVE) {
                                             return hero();
                                         }
                                         match topic {
