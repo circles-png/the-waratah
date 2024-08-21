@@ -68,7 +68,7 @@ impl Article {
                             url: fragment[1],
                             caption: fragment[2],
                         }),
-                        _ => unreachable!(),
+                        other => unreachable!("{other}"),
                     },
                 )
             })
