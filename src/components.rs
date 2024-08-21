@@ -32,12 +32,12 @@ pub fn App() -> impl IntoView {
     view! {
         <Router>
             <div class="flex flex-col h-full">
-                <Header />
                 <Routes>
                     <Route
                         path="/"
                         view=|| {
                             view! {
+                                <Header />
                                 <PageContainer>
                                     <ArticlePreviews />
                                 </PageContainer>
@@ -49,6 +49,7 @@ pub fn App() -> impl IntoView {
                         path="/articles/:id"
                         view=|| {
                             view! {
+                                <Header small=true />
                                 <PageContainer>
                                     <Article />
                                 </PageContainer>
@@ -60,6 +61,7 @@ pub fn App() -> impl IntoView {
                         path="/crosswords/:id"
                         view=|| {
                             view! {
+                                <Header />
                                 <PageContainer>
                                     <Crossword />
                                 </PageContainer>
@@ -71,6 +73,7 @@ pub fn App() -> impl IntoView {
                         path="/*"
                         view=|| {
                             view! {
+                                <Header />
                                 <PageContainer>404</PageContainer>
                                 <Footer />
                             }
@@ -84,7 +87,7 @@ pub fn App() -> impl IntoView {
 }
 
 #[component]
-pub fn Header() -> impl IntoView {
+pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
     view! {
         <header class="relative p-4 text-white bg-black">
             <div class="inset-0 items-center justify-between hidden pointer-events-none sm:p-4 sm:absolute sm:flex">
@@ -106,10 +109,22 @@ pub fn Header() -> impl IntoView {
             >
 
                 <Heading>
-                    <div class="pt-2 text-6xl capitalize font-blackletter">
+                    <div
+                        class="pt-2 capitalize font-blackletter"
+                        class=("text-4xl", small)
+                        class=("text-6xl", !small)
+                    >
                         "The Warrah Recliner"
                     </div>
-                    <div class="block pb-2 font-serif text-base">"Trusted by dozens."</div>
+                    {small
+                        .not()
+                        .then_some(
+                            view! {
+                                <div class="block pb-2 font-serif text-base">
+                                    "Trusted by dozens."
+                                </div>
+                            },
+                        )}
                 </Heading>
             </a>
         </header>
@@ -402,12 +417,12 @@ pub fn ArticlePreview(
                     .then_some(
                         view! {
                             <Caption>
-                                <div class=format!(
-                                    "text-left font-serif {}",
-                                    (layout.size == ArticleSize::Hero)
-                                        .then_some("text-lg")
-                                        .unwrap_or_default(),
-                                )>{article.blurb}</div>
+                                <div
+                                    class="font-serif text-left"
+                                    class=("text-lg", layout.size == ArticleSize::Hero)
+                                >
+                                    {article.blurb}
+                                </div>
                             </Caption>
                         },
                     )}
@@ -503,10 +518,11 @@ pub fn Article() -> impl IntoView {
 #[component]
 pub fn Divider(#[prop(optional)] light: bool) -> impl IntoView {
     view! {
-        <div class=format!(
-            "w-full h-px {}",
-            if light { "bg-gray-200" } else { "bg-gray-800" },
-        )></div>
+        <div
+            class="w-full h-px {}"
+            class=("bg-gray-200", light)
+            class=("bg-gray-800", !light)
+        ></div>
     }
 }
 
@@ -835,14 +851,10 @@ pub fn CrosswordGrid(
                             },
                             |(_, word_start)| {
                                 view! {
-                                    <div class=move || {
-                                        format!(
-                                            "relative text-xl border border-black size-8 {}",
-                                            (selected.get() == Some(index))
-                                                .then_some("bg-yellow-200")
-                                                .unwrap_or_default(),
-                                        )
-                                    }>
+                                    <div
+                                        class=("bg-yellow-200", move || selected() == Some(index))
+                                        class="relative text-xl border border-black size-8"
+                                    >
                                         <input
                                             class="text-center bg-transparent size-full focus:outline-none caret-transparent"
                                             on:focus=move |_| {
@@ -921,7 +933,7 @@ pub fn Crossword() -> impl IntoView {
     });
     let check = move |event: MouseEvent| {
         let button: HtmlButtonElement = event_target(&event);
-        button.set_text_content(Some(format!("{:?}", correct()).as_str()));
+        button.set_text_content(Some(format!("{}", correct()).as_str()));
     };
     view! {
         <div class="flex flex-col w-full gap-4 p-4 lg:flex-row">
