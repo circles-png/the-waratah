@@ -275,13 +275,16 @@ pub fn ArticlePreviews() -> impl IntoView {
                                                                 />
                                                                 {next!(without_image without_category)}
                                                             </div>
-                                                            <div class="flex flex-col col-span-5">
+                                                            <A
+                                                                class="flex flex-col col-span-5"
+                                                                href=format!("/articles/{}", main.id)
+                                                            >
                                                                 <img
                                                                     src=main.image.url
                                                                     alt=main.image.caption
                                                                     class="object-cover aspect-[3/2]"
                                                                 />
-                                                            </div>
+                                                            </A>
                                                         </div>
                                                         <div>{next!()}</div>
                                                     </div>
