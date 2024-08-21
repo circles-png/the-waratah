@@ -1433,7 +1433,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "the-yesterday"
+name = "the-warrah-recliner"
 version = "0.1.0"
 dependencies = [
  "anyhow",
