@@ -114,7 +114,7 @@ pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
                         class=("text-4xl", small)
                         class=("text-6xl", !small)
                     >
-                        "The Warrah Recliner"
+                        "The Waratah"
                     </div>
                     {small
                         .not()
@@ -588,7 +588,7 @@ pub fn Footer(#[prop(optional)] ads: bool) -> impl IntoView {
         <footer class="flex flex-col p-4 text-white bg-black">
             <A href="/">
                 <Heading>
-                    <div class="capitalize font-blackletter">"The Warrah Recliner"</div>
+                    <div class="capitalize font-blackletter">"The Waratah"</div>
                 </Heading>
             </A>
             <div class="flex justify-between">
