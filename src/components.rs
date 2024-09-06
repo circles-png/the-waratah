@@ -1,4 +1,4 @@
-use crate::crossword::{Crossword, Direction, Vec2};
+use crate::crossword::{Crossword, Direction, Vec2, Word};
 use itertools::Itertools;
 use leptos::ev::{keydown, scroll, KeyboardEvent, MouseEvent};
 use leptos::leptos_dom::helpers::location;
@@ -673,6 +673,7 @@ pub fn CrosswordGrid(
     grid: Vec<Option<(char, Option<usize>)>>,
     crossword: &'static Crossword,
     #[prop(into)] on_solution_change: Callback<HashMap<usize, Option<char>>>,
+    #[prop(into)] on_selection_change: Callback<Option<Word>>,
 ) -> impl IntoView {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     enum Move {
@@ -743,6 +744,23 @@ pub fn CrosswordGrid(
     );
     let (last_direction, set_last_direction) = create_signal(Direction::default());
     let size = crossword.size();
+    let on_selection_change = move || {
+        let position = move |index| Vec2 {
+            x: index % size.x,
+            y: index / size.x,
+        };
+        on_selection_change(
+            selected()
+                .and_then(|selected| {
+                    crossword
+                        .words
+                        .iter()
+                        .filter(|word| word.contains(position(selected)))
+                        .find_or_first(|word| word.direction == last_direction())
+                })
+                .copied(),
+        );
+    };
     {
         let grid = grid.clone();
         let handler = move |event: KeyboardEvent| {
@@ -758,6 +776,7 @@ pub fn CrosswordGrid(
                 "Backspace" => (SetSolution::Clear, Move::Previous),
                 "Escape" => {
                     set_selected(None);
+                    on_selection_change();
                     event.prevent_default();
                     return;
                 }
@@ -812,6 +831,7 @@ pub fn CrosswordGrid(
                     break 'out;
                 };
                 set_selected(Some(new_selected));
+                on_selection_change();
             }
             match new {
                 SetSolution::Keep => {}
@@ -830,7 +850,6 @@ pub fn CrosswordGrid(
         };
         window_event_listener(keydown, handler);
     }
-
     view! {
         <div class="flex justify-center w-full p-2 overflow-x-auto">
             <div class="grid" style=format!("grid-template-columns: repeat({}, auto);", size.x)>
@@ -844,7 +863,10 @@ pub fn CrosswordGrid(
                                     <div class="bg-black">
                                         <button
                                             class="size-full"
-                                            on:click=move |_| set_selected(None)
+                                            on:click=move |_| {
+                                                set_selected(None);
+                                                on_selection_change();
+                                            }
                                         ></button>
                                     </div>
                                 }
@@ -861,14 +883,14 @@ pub fn CrosswordGrid(
                                                     y: index / size.x,
                                                 };
                                                 selected()
-                                                    .is_some_and(|selected| {
+                                                    .and_then(|selected| {
                                                         crossword
                                                             .words
                                                             .iter()
                                                             .filter(|word| word.contains(position(selected)))
                                                             .find_or_first(|word| word.direction == last_direction())
-                                                            .map_or(false, |word| word.contains(position(index)))
                                                     })
+                                                    .map_or(false, |word| word.contains(position(index)))
                                             },
                                         )
                                         class="relative text-xl border border-black size-8"
@@ -884,6 +906,7 @@ pub fn CrosswordGrid(
                                                     Some(selected) if selected == index => set_selected(None),
                                                     _ => set_selected(Some(index)),
                                                 }
+                                                on_selection_change();
                                             }
                                             value=move || {
                                                 solution.get().get(&index).unwrap().unwrap_or_default()
@@ -957,6 +980,7 @@ pub fn Crossword() -> impl IntoView {
         let button: HtmlButtonElement = event_target(&event);
         button.set_text_content(Some(format!("{}", correct()).as_str()));
     };
+    let (selected, set_selected) = create_signal(None::<Word>);
     view! {
         <div class="flex flex-col w-full gap-4 p-4 lg:flex-row">
             <div class="flex flex-col gap-2 lg:basis-0 lg:grow">
@@ -966,6 +990,7 @@ pub fn Crossword() -> impl IntoView {
                             grid=grid()
                             crossword=crossword()
                             on_solution_change=set_solution
+                            on_selection_change=set_selected
                         />
                     }
                 }} <div class="flex justify-center has-[:disabled]:hidden">
@@ -993,7 +1018,7 @@ pub fn Crossword() -> impl IntoView {
                                         <h1 class="text-2xl font-semibold">
                                             {direction.to_string()}
                                         </h1>
-                                        <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-2">
+                                        <div class="grid grid-cols-[auto_minmax(0,1fr)]">
                                             {crossword()
                                                 .words
                                                 .iter()
@@ -1002,16 +1027,21 @@ pub fn Crossword() -> impl IntoView {
                                                     starts().iter().position(|start| *start == word.position)
                                                 })
                                                 .map(|word| {
+                                                    let current = Some(*word) == selected();
                                                     view! {
-                                                        <div class="font-semibold">
+                                                        <div
+                                                            class="pr-2 font-semibold"
+                                                            class=("bg-blue-200", current)
+                                                        >
                                                             {starts()
                                                                 .iter()
                                                                 .position(|start| *start == word.position)
                                                                 .map(|index| index + 1)}
                                                         </div>
-                                                        <div>
-                                                            {format!("{} ({})", word.clue, word.answer.len())}
-                                                        </div>
+                                                        <div class=(
+                                                            "bg-blue-200",
+                                                            current,
+                                                        )>{format!("{} ({})", word.clue, word.answer.len())}</div>
                                                     }
                                                 })
                                                 .collect_view()}
