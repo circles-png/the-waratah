@@ -44,14 +44,21 @@ pub struct Letter {
     pub position: Vec2,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, VariantArray, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, VariantArray, Display, Default)]
 pub enum Direction {
+    #[default]
     Across,
     Down,
 }
 
 impl Direction {
     pub const ALL: &'static [Self] = Self::VARIANTS;
+    pub const fn other(self) -> Self {
+        match self {
+            Self::Across => Self::Down,
+            Self::Down => Self::Across,
+        }
+    }
 }
 
 impl Crossword {

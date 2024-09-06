@@ -741,7 +741,7 @@ pub fn CrosswordGrid(
             .filter_map(|(index, cell)| cell.as_ref().map(|_| (index, None::<char>)))
             .collect::<HashMap<_, _>>(),
     );
-    let (last_direction, set_last_direction) = create_signal(None::<Direction>);
+    let (last_direction, set_last_direction) = create_signal(Direction::default());
     let size = crossword.size();
     {
         let grid = grid.clone();
@@ -772,7 +772,7 @@ pub fn CrosswordGrid(
                     if movement.out_of_bounds(size, selected).unwrap() {
                         return None;
                     }
-                    set_last_direction(movement.direction());
+                    set_last_direction(movement.direction().unwrap_or_default());
                     Some(movement.new_index(size, selected).unwrap())
                 };
                 let new_selected = match movement {
@@ -786,11 +786,7 @@ pub fn CrosswordGrid(
                             .iter()
                             .find(|word| {
                                 word.contains(position)
-                                    && last_direction.with(|direction| {
-                                        direction
-                                            .map(|direction| word.direction == direction)
-                                            .unwrap_or(true)
-                                    })
+                                    && last_direction.with(|direction| word.direction == *direction)
                             })
                             .or_else(|| {
                                 crossword.words.iter().find(|word| word.contains(position))
@@ -834,6 +830,7 @@ pub fn CrosswordGrid(
         };
         window_event_listener(keydown, handler);
     }
+
     view! {
         <div class="flex justify-center w-full p-2 overflow-x-auto">
             <div class="grid" style=format!("grid-template-columns: repeat({}, auto);", size.x)>
@@ -856,10 +853,32 @@ pub fn CrosswordGrid(
                                 view! {
                                     <div
                                         class=("bg-yellow-200", move || selected() == Some(index))
+                                        class=(
+                                            "bg-blue-200",
+                                            move || {
+                                                let position = move |index| Vec2 {
+                                                    x: index % size.x,
+                                                    y: index / size.x,
+                                                };
+                                                selected()
+                                                    .is_some_and(|selected| {
+                                                        crossword
+                                                            .words
+                                                            .iter()
+                                                            .filter(|word| word.contains(position(selected)))
+                                                            .find_or_first(|word| word.direction == last_direction())
+                                                            .map_or(false, |word| word.contains(position(index)))
+                                                    })
+                                            },
+                                        )
                                         class="relative text-xl border border-black size-8"
                                     >
+
                                         <input
                                             class="text-center bg-transparent size-full focus:outline-none caret-transparent"
+                                            on:mousedown=move |_| {
+                                                set_last_direction(last_direction().other());
+                                            }
                                             on:focus=move |_| {
                                                 match selected.get() {
                                                     Some(selected) if selected == index => set_selected(None),
@@ -990,7 +1009,9 @@ pub fn Crossword() -> impl IntoView {
                                                                 .position(|start| *start == word.position)
                                                                 .map(|index| index + 1)}
                                                         </div>
-                                                        <div>{word.clue}</div>
+                                                        <div>
+                                                            {format!("{} ({})", word.clue, word.answer.len())}
+                                                        </div>
                                                     }
                                                 })
                                                 .collect_view()}
