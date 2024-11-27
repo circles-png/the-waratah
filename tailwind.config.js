@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'blackletter': ["Unifraktur Maguntia"],
+        'newspaper': ["Old Newspaper"],
         'noto': ["Noto Sans Display"],
         'sans': ["PT Sans"],
         'serif': ["PT Serif"],
