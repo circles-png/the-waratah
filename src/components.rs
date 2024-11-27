@@ -110,7 +110,7 @@ pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
 
                 <Heading>
                     <div
-                        class="pt-2 capitalize font-newspaper"
+                        class="pt-2 pb-2 capitalize font-newspaper"
                         class=("text-4xl", small)
                         class=("text-6xl", !small)
                     >
