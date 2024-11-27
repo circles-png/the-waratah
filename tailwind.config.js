@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'newspaper': ["Old Newspaper"],
+        'title': ["Chomsky"],
         'noto': ["Noto Sans Display"],
         'sans': ["PT Sans"],
         'serif': ["PT Serif"],

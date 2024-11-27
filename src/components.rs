@@ -110,9 +110,9 @@ pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
 
                 <Heading>
                     <div
-                        class="pt-2 pb-2 capitalize font-newspaper"
-                        class=("text-4xl", small)
-                        class=("text-6xl", !small)
+                        class="pt-2 capitalize font-title"
+                        class=("text-5xl", small)
+                        class=("text-8xl", !small)
                     >
                         "The Waratah"
                     </div>
@@ -120,7 +120,7 @@ pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
                         .not()
                         .then_some(
                             view! {
-                                <div class="block pb-2 font-newspaper text-base">
+                                <div class="block pb-2 font-serif italic text-base">
                                     "Trusted by dozens."
                                 </div>
                             },
@@ -588,7 +588,7 @@ pub fn Footer(#[prop(optional)] ads: bool) -> impl IntoView {
         <footer class="flex flex-col p-4 text-white bg-black">
             <A href="/">
                 <Heading>
-                    <div class="capitalize font-newspaper">"The Waratah"</div>
+                    <div class="capitalize font-title">"The Waratah"</div>
                 </Heading>
             </A>
             <div class="flex justify-between">
