@@ -120,8 +120,8 @@ pub fn Header(#[prop(optional)] small: bool) -> impl IntoView {
                         .not()
                         .then_some(
                             view! {
-                                <div class="block pb-2 font-serif italic text-base">
-                                    "Trusted by dozens."
+                                <div class="block pb-2 font-serif italic text-lg">
+                                   r#""Trusted by dozens""#
                                 </div>
                             },
                         )}
