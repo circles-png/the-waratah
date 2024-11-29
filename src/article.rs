@@ -1,5 +1,14 @@
 use anyhow::{anyhow, Result};
 use lazy_static::lazy_static;
+use nom::{
+    branch::alt,
+    bytes::complete::{tag, take_until1},
+    combinator::{all_consuming, map, map_res, rest},
+    error::Error,
+    multi::{length_data, separated_list1},
+    sequence::{pair, preceded, terminated, tuple},
+    IResult,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Article {
@@ -35,55 +44,54 @@ impl Fragment {
 }
 
 impl Article {
-    pub fn from_str(s: &'static str) -> Result<Self> {
-        let mut lines = s.lines();
-        let first = lines.next().ok_or_else(|| anyhow!("no data"))?;
-        let (topic_len, rest) = first
-            .split_once(' ')
-            .ok_or_else(|| anyhow!("invalid data"))?;
-        let topic_len: usize = topic_len.parse()?;
-        let topic = &rest[..topic_len];
-        let rest = &rest[topic_len + 1..];
-        let (id, index) = rest
-            .split_once(' ')
-            .ok_or_else(|| anyhow!("invalid data"))?;
-        let index = index.parse().unwrap();
-        let title = lines.next().ok_or_else(|| anyhow!("no title"))?;
-        let blurb = lines.next().ok_or_else(|| anyhow!("no blurb"))?;
-        let image = Image {
-            url: lines.next().ok_or_else(|| anyhow!("no image"))?,
-            caption: lines.next().ok_or_else(|| anyhow!("no image title"))?,
-        };
-        let fragments: Vec<_> = lines.collect();
-        let fragments: Result<Vec<_>> = fragments
-            .split(|line| line.is_empty())
-            .map(|fragment| {
-                Ok(
-                    match *fragment
-                        .first()
-                        .ok_or_else(|| anyhow!("no fragment data"))?
-                    {
-                        "text" => Fragment::Text(fragment[1]),
-                        "image" => Fragment::Image(Image {
-                            url: fragment[1],
-                            caption: fragment[2],
-                        }),
-                        other => unreachable!("{other}"),
-                    },
-                )
-            })
-            .collect();
-        let fragments = fragments?;
-
-        Ok(Self {
-            id,
-            topic,
-            index,
-            blurb,
-            title,
-            image,
-            fragments,
-        })
+    pub fn parse(input: &'static str) -> IResult<&'static str, Self> {
+        map(
+            tuple((
+                length_data(map_res(
+                    terminated(take_until1::<_, _, Error<&str>>(" "), tag(" ")),
+                    |input: &str| input.parse::<usize>(),
+                )),
+                preceded(tag(" "), take_until1(" ")),
+                preceded(
+                    tag(" "),
+                    map_res(take_until1("\n"), |input: &str| input.parse::<usize>()),
+                ),
+                preceded(tag("\n"), take_until1("\n")),
+                preceded(tag("\n"), take_until1("\n")),
+                map(
+                    pair(
+                        preceded(tag("\n"), take_until1("\n")),
+                        preceded(tag("\n"), take_until1("\n")),
+                    ),
+                    |(url, caption)| Image { url, caption },
+                ),
+                preceded(
+                    tag("\n"),
+                    separated_list1(
+                        tag("\n\n"),
+                        alt((
+                            map(
+                                tuple((
+                                    preceded(tag("image\n"), take_until1("\n")),
+                                    preceded(tag("\n"), take_until1("\n")),
+                                )),
+                                |(url, caption)| Fragment::Image(Image { url, caption }),
+                            ),
+                            map(alt((take_until1("\n\n"), rest)), Fragment::Text),
+                        )),
+                    ),
+                ),
+            )),
+            |(topic, id, index, title, blurb, image, fragments)| Self {
+                id,
+                topic,
+                index,
+                blurb,
+                title,
+                image,
+                fragments,
+            },
+        )(input)
     }
 
     pub fn words(&self) -> usize {
@@ -112,7 +120,7 @@ lazy_static! {
                 .split_once(' ')
                 .ok_or_else(|| anyhow!("invalid data"))?;
             let length: usize = length.parse()?;
-            let article = Article::from_str(&rest[..length])?;
+            let (_, article) = all_consuming(Article::parse)(&rest[..length])?;
             articles.push(article);
             data = rest
                 .get(length + 1..)
